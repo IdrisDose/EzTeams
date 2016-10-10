@@ -10,6 +10,14 @@ git:
   submodules: false
 before_install: git submodule update --init --recursive
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
 install: ./gradlew setupCIWorkspace
 script: ./gradlew build
 
