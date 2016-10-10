@@ -1,0 +1,9 @@
+[
+    {
+        "modid": "ezteams",
+        "name": "ezteams",
+        "version": "1.0-SNAPSHOT",
+        "description": "Easy Made Teams for PixleMC by Idris_",
+        "mcversion": "1.8.9"
+    }
+]
