@@ -1,13 +1,9 @@
 package net.idrisdev.mc.ezteams.events;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.pixelmonmod.pixelmon.api.enums.BattleResults;
 import com.pixelmonmod.pixelmon.api.events.BattleStartedEvent;
 import com.pixelmonmod.pixelmon.api.events.PlayerBattleEndedEvent;
 import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
-import net.idrisdev.mc.ezteams.data.PlayerData;
 import net.idrisdev.mc.ezteams.data.PlayerDataStorage;
-import net.idrisdev.mc.ezteams.utils.ETUtils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -16,9 +12,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import java.util.Optional;
 import java.util.UUID;
 
-import static net.idrisdev.mc.ezteams.utils.ETUtils.game;
-import static net.idrisdev.mc.ezteams.utils.ETUtils.getConsoleSrc;
-import static net.idrisdev.mc.ezteams.utils.ETUtils.logger;
+import static net.idrisdev.mc.ezteams.utils.ETUtils.*;
 
 
 /**
