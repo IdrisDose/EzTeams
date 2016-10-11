@@ -34,7 +34,7 @@ minecraft {
 
 
 group 'net.idrisdev.mc'
-version '1.0-SNAPSHOT'
+version = "$project.version"
 description = 'Easy Made Teams for PixleMC by Idris_'
 
 defaultTasks 'clean', 'build'
