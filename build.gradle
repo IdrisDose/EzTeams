@@ -44,4 +44,6 @@ targetCompatibility = '1.8'
 
 dependencies {
     compile "org.spongepowered:spongeapi:4.1.0"
+    compile files('libs/Pixelmon-1.8.9-4.2.7-universal.jar')
+    runtime fileTree(dir: 'libs', include: '*.jar')
 }
