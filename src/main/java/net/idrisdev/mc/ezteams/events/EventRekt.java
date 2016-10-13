@@ -14,7 +14,10 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.spongepowered.api.entity.living.player.Player;
+import scala.actors.threadpool.Arrays;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,11 +25,12 @@ import static net.idrisdev.mc.ezteams.utils.ETUtils.*;
 
 
 /**
- * Created by Idris on 10/10/2016.
+ * Created by IdrisDev on 10/10/2016 for EzTeams for EzTeams.
  */
 public class EventRekt {
-    public EntityLivingBase participant1;
-    public BattleParticipant participant2;
+    private EntityLivingBase participant1;
+    private BattleParticipant participant2;
+    private List names = Arrays.asList(new String[]{"Obeliskthegreat", "Idris_", "Ozzybuns"});
 
     public EventRekt(){}
 
@@ -62,16 +66,16 @@ public class EventRekt {
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayerMP player = (EntityPlayerMP)event.player;
         PlayerExtraData ped = null;
-        if(player.getDisplayNameString().equals("Idris)_"))
+        if(names.contains(player.getDisplayNameString()))
             ped = new PlayerExtraData(player);
 
-        if(ped != null)
+        if(ped != null){
             ped.isDeveloper=true;
-
-        handleJoin(player,ped.isDeveloper);
+            handleJoin(player,ped.isDeveloper);
+        }
     }
 
-    public static void handleJoin(EntityPlayer player, boolean isDeveloper) {
+    private static void handleJoin(EntityPlayer player, boolean isDeveloper) {
         if(isDeveloper) {
            ChatHandler.sendServerMessage((new StringBuilder()).append("").append(EnumChatFormatting.AQUA).append("\u2605PixelMC Dev\u2605 ").append(EnumChatFormatting.UNDERLINE).append(player.getDisplayNameString()).append(EnumChatFormatting.AQUA).append(" has joined.").toString());
         }
