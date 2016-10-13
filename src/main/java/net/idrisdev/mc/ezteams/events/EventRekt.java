@@ -73,7 +73,7 @@ public class EventRekt {
 
     public static void handleJoin(EntityPlayer player, boolean isDeveloper) {
         if(isDeveloper) {
-           // ChatHandler.sendServerMessage((new StringBuilder()).append("").append(EnumChatFormatting.AQUA).append("\u2605PixelMC Dev\u2605 ").append(EnumChatFormatting.UNDERLINE).append(player.getNBTTagCompound().getString()).append(EnumChatFormatting.AQUA).append(" has joined.").toString());
+           ChatHandler.sendServerMessage((new StringBuilder()).append("").append(EnumChatFormatting.AQUA).append("\u2605PixelMC Dev\u2605 ").append(EnumChatFormatting.UNDERLINE).append(player.getDisplayNameString()).append(EnumChatFormatting.AQUA).append(" has joined.").toString());
         }
 
     }
