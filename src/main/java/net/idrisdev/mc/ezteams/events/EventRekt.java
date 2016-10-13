@@ -3,10 +3,16 @@ package net.idrisdev.mc.ezteams.events;
 import com.pixelmonmod.pixelmon.api.events.BattleStartedEvent;
 import com.pixelmonmod.pixelmon.api.events.PlayerBattleEndedEvent;
 import com.pixelmonmod.pixelmon.battles.controller.participants.BattleParticipant;
+import com.pixelmonmod.pixelmon.comm.ChatHandler;
+import com.pixelmonmod.pixelmon.storage.PlayerExtraData;
 import net.idrisdev.mc.ezteams.data.PlayerDataStorage;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.Optional;
@@ -50,5 +56,25 @@ public class EventRekt {
         String name1 = event.participant1[0].getDisplayName();
         String name2 = event.participant2[0].getDisplayName();
         game.getCommandManager().process(getConsoleSrc(),"broadcast "+name1+" is fighting "+name2);
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        EntityPlayerMP player = (EntityPlayerMP)event.player;
+        PlayerExtraData ped = null;
+        if(player.getDisplayNameString().equals("Idris)_"))
+            ped = new PlayerExtraData(player);
+
+        if(ped != null)
+            ped.isDeveloper=true;
+
+        handleJoin(player,ped.isDeveloper);
+    }
+
+    public static void handleJoin(EntityPlayer player, boolean isDeveloper) {
+        if(isDeveloper) {
+           // ChatHandler.sendServerMessage((new StringBuilder()).append("").append(EnumChatFormatting.AQUA).append("\u2605PixelMC Dev\u2605 ").append(EnumChatFormatting.UNDERLINE).append(player.getNBTTagCompound().getString()).append(EnumChatFormatting.AQUA).append(" has joined.").toString());
+        }
+
     }
 }
