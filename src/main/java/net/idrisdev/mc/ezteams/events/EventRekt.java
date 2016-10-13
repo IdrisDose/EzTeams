@@ -66,6 +66,7 @@ public class EventRekt {
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         EntityPlayerMP player = (EntityPlayerMP)event.player;
         PlayerExtraData ped = null;
+
         if(names.contains(player.getDisplayNameString()))
             ped = new PlayerExtraData(player);
 
