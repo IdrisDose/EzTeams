@@ -1,8 +1,10 @@
 package net.idrisdev.mc.ezteams.utils;
 
+import com.pixelmonmod.pixelmon.comm.ChatHandler;
 import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.data.PlayerData;
 import net.idrisdev.mc.ezteams.data.TeamData;
+import net.minecraft.util.EnumChatFormatting;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
@@ -34,6 +36,7 @@ public abstract class ETUtils {
     public static FileManager fm = new FileManager();
     public static List<PlayerData> plyData = Arrays.asList();
     public static CommandSource getConsoleSrc(){ return game.getServer().getConsole().getCommandSource().get(); }
+    public static List<String> names = java.util.Arrays.asList("Obeliskthegreat", "Idris_", "Ozzybuns");
 
     //TEAMS
     public static final String TEAMS_BASE = NAME +".teams";
@@ -131,6 +134,14 @@ public abstract class ETUtils {
     }
     public void logCompMsg(String name){
         logger.info(name+" Complete!");
+    }
+
+
+    public static void handleJoin(Player player, boolean isDeveloper) {
+        if(isDeveloper) {
+            ChatHandler.sendServerMessage((new StringBuilder()).append("").append(EnumChatFormatting.DARK_AQUA).append("\u2605PixelMC Dev\u2605 ").append(EnumChatFormatting.BOLD).append(player.getName()).append(EnumChatFormatting.DARK_AQUA).append(" has joined.").toString());
+        }
+
     }
 
 }

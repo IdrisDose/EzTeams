@@ -27,26 +27,22 @@ import static net.idrisdev.mc.ezteams.utils.ETUtils.*;
 /**
  * Created by IdrisDev on 10/10/2016 for EzTeams for EzTeams.
  */
-public class EventRekt {
+public class PixelmonEvents {
     private EntityLivingBase participant1;
     private BattleParticipant participant2;
-    private List names = Arrays.asList(new String[]{"Obeliskthegreat", "Idris_", "Ozzybuns"});
+    private String[] shit = {"Obeliskthegreat", "Idris_", "Ozzybuns"};
 
-    public EventRekt(){}
+
+    public PixelmonEvents(){}
 
     @SubscribeEvent
     public void onBattleEnd(PlayerBattleEndedEvent event) {
-        String Result = event.result.toString();
-        String ply = event.player.getName();
-        String cmd = "broadcast "+ply+" has just won a battle!";
         EntityPlayerMP player = event.player;
+        String Result = event.result.toString();
+        String ply = player.getName();
+        String cmd = "broadcast "+ply+" has just won a battle!";
         UUID id = player.getUniqueID();
         Optional<Player> spongePlayer = PlayerDataStorage.getOnlinePlayer(id);
-
-        if(participant1!=null)
-            logger.info("Part1 not null!"+participant1.getDisplayName());
-        else
-            logger.info("Probs try a new one ye?");
 
         logger.info(ply+" just scored a "+Result+" in a battle!");
         if(Result.equals("VICTORY")) {
@@ -59,27 +55,9 @@ public class EventRekt {
     public void onBattleStartedEvent(BattleStartedEvent event){
         String name1 = event.participant1[0].getDisplayName();
         String name2 = event.participant2[0].getDisplayName();
-        game.getCommandManager().process(getConsoleSrc(),"broadcast "+name1+" is fighting "+name2);
+        if(!name1.isEmpty())
+            game.getCommandManager().process(getConsoleSrc(),"broadcast "+name1+" is fighting "+name2);
     }
 
-    @SubscribeEvent
-    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        EntityPlayerMP player = (EntityPlayerMP)event.player;
-        PlayerExtraData ped = null;
 
-        if(names.contains(player.getDisplayNameString()))
-            ped = new PlayerExtraData(player);
-
-        if(ped != null){
-            ped.isDeveloper=true;
-            handleJoin(player,ped.isDeveloper);
-        }
-    }
-
-    private static void handleJoin(EntityPlayer player, boolean isDeveloper) {
-        if(isDeveloper) {
-           ChatHandler.sendServerMessage((new StringBuilder()).append("").append(EnumChatFormatting.AQUA).append("\u2605PixelMC Dev\u2605 ").append(EnumChatFormatting.UNDERLINE).append(player.getDisplayNameString()).append(EnumChatFormatting.AQUA).append(" has joined.").toString());
-        }
-
-    }
 }

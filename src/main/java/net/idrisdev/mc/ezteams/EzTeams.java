@@ -2,7 +2,7 @@ package net.idrisdev.mc.ezteams;
 
 import com.google.inject.Inject;
 import com.pixelmonmod.pixelmon.Pixelmon;
-import com.pixelmonmod.pixelmon.api.events.PlayerBattleEndedEvent;
+import com.pixelmonmod.pixelmon.comm.ChatHandler;
 import net.idrisdev.mc.ezteams.commands.DebugDBCmd;
 import net.idrisdev.mc.ezteams.commands.DebugDBUCmd;
 import net.idrisdev.mc.ezteams.commands.TeamCommands;
@@ -10,15 +10,18 @@ import net.idrisdev.mc.ezteams.data.DataStorage;
 import net.idrisdev.mc.ezteams.data.PlayerData;
 import net.idrisdev.mc.ezteams.data.PlayerDataStorage;
 import net.idrisdev.mc.ezteams.data.TeamData;
-import net.idrisdev.mc.ezteams.events.EventRekt;
+import net.idrisdev.mc.ezteams.events.ForgeEvents;
+import net.idrisdev.mc.ezteams.events.PixelmonEvents;
 import net.idrisdev.mc.ezteams.utils.ETUtils;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.common.MinecraftForge;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
@@ -26,12 +29,17 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Dependency;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+
+import static net.idrisdev.mc.ezteams.utils.ETUtils.handleJoin;
+import static net.idrisdev.mc.ezteams.utils.ETUtils.names;
+import static net.idrisdev.mc.ezteams.utils.ETUtils.sendSrcPlainMessage;
 
 /**
  * Created by Idris_ on 06/10/2016.
@@ -78,7 +86,8 @@ public class EzTeams {
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event){
-        Pixelmon.EVENT_BUS.register(new EventRekt());
+        Pixelmon.EVENT_BUS.register(new PixelmonEvents());
+        MinecraftForge.EVENT_BUS.register(new ForgeEvents());
     }
 
     @Listener
@@ -106,13 +115,6 @@ public class EzTeams {
         registerCommands();
     }
 
-
-
-
-
-
-
-
     @Listener
     public void onLoad(GameLoadCompleteEvent event) {
         logger.info("EzTeams " + VERSION + " DONE!");
@@ -120,9 +122,13 @@ public class EzTeams {
 
     @Listener
     public void onJoin(ClientConnectionEvent.Join event) {
-        UUID plyID = event.getTargetEntity().getUniqueId();
-        String name = event.getTargetEntity().getName();
-        ETUtils.sendSrcPlainMessage(PlayerDataStorage.getOnlinePlayer(plyID).get().getCommandSource(),"YOUR UUID IS: "+plyID);
+        Player ply = event.getTargetEntity();
+        UUID plyID = ply.getUniqueId();
+        String name = ply.getName();
+
+
+
+
     }
 
 
@@ -138,7 +144,6 @@ public class EzTeams {
         if (DEBUG) {
             cmdSrvc.register(this, new DebugDBCmd(), "debugdb");
             cmdSrvc.register(this, new DebugDBUCmd(), "debugdbu");
-
         }
 
     }
