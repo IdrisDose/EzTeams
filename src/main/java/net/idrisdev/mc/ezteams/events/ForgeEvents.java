@@ -26,7 +26,7 @@ public class ForgeEvents {
         try {
             //handleJoinForge(player,true);
             if(names.contains(name)) {
-                logger.info("The Idris Logged in!");
+                logger.info("One of the kings logged in");
                 PixelmonStorage.PokeballManager.getPlayerStorage(player).getExtraData().isDeveloper = true;
                 PixelmonStorage.PokeballManager.getPlayerStorage(player).getExtraData().hasRainbowSash = false;
                 PixelmonStorage.PokeballManager.getPlayerStorage(player).getExtraData().hasSash = true;
