@@ -31,7 +31,7 @@ public class TeamListCommand {
 
                         String name = team.getName();
                         int points = team.getPoints();
-                        if(!name.equals("staff")){
+                        if(!name.equals("staff")&&!name.equals("default")){
                             name=name.substring(0,1).toUpperCase()+name.substring(1);
                             Utils.sendPrettyMessage(src,"Team "+name+" - POINTS: "+points);
                         }
