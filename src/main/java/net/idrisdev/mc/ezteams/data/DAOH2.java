@@ -1,12 +1,7 @@
 package net.idrisdev.mc.ezteams.data;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.utils.ETUtils;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMapper;
+import net.idrisdev.mc.ezteams.utils.Utils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,18 +13,14 @@ import java.sql.*;
 /**
  * Created by Idris on 9/10/2016.
  */
-public class DAOH2 extends ETUtils {
+public class DAOH2 extends Utils {
+    private final static String h2name="h2-1.4.191.jar";
     private final static Path conf = Paths.get("config").resolve(NAME).resolve("database");
     private final static Path dbFile = conf.resolve("ezteams.trace.db");
-    private final static Path dbDriver = conf.resolve("h2-1.3.173.jar");
+    private final static Path dbDriver = conf.resolve(h2name);
     public static Connection con;
     static boolean madeConnection = false;
     private static Statement stmt;
-    private HoconConfigurationLoader loader;
-    private CommentedConfigurationNode root = SimpleCommentedConfigurationNode.root(ConfigurationOptions.defaults().setHeader(ETUtils.CONFIG_HEADER));
-    private ObjectMapper<ConfigBase>.BoundInstance configMapper;
-    private ConfigBase configBase;
-
     public DAOH2() {
     }
 
@@ -71,9 +62,9 @@ public class DAOH2 extends ETUtils {
     private static void copyDriverFromJar() {
         try {
             logger.info("Extracting driver.");
-            InputStream e = EzTeams.class.getClassLoader().getResourceAsStream("h2-1.3.173.jar");
+            InputStream e = EzTeams.class.getClassLoader().getResourceAsStream(h2name);
             FileOutputStream fos2 = null;
-            fos2 = new FileOutputStream("./config/ezteams/database/sh2-1.3.173.jar");
+            fos2 = new FileOutputStream("./config/ezteams/database/"+h2name);
             byte[] buf = new byte[2048];
 
             for (int r = e.read(buf); r != -1; r = e.read(buf)) {

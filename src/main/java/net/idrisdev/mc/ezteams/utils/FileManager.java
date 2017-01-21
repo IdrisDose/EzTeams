@@ -13,13 +13,15 @@ import java.nio.file.Paths;
 /**
  * Created by Idris on 8/10/2016.
  */
-public class FileManager extends ETUtils {
+public class FileManager extends Utils {
 
 
     public FileManager() {}
 
     public void init(){
         Path conf = Paths.get("config").resolve(NAME);
+
+        /*
         Path confFilePath = conf.resolve(NAME +".conf");
         File confFile = confFilePath.toFile();
         try {
@@ -31,7 +33,7 @@ public class FileManager extends ETUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        */
 
     }
     public void checkDir(Path path){
