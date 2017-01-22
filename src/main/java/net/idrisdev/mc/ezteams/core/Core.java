@@ -56,10 +56,10 @@ public class Core {
         //Send init message to logger!
         logger.info("EzTeams " + VERSION + " INITIALIZING!");
         dao = new DAO();
-        plugin.teams = dao.getTeams();
-        plugin.allPlayers = dao.getMembers();
+        EzTeams.teams = dao.getTeams();
+        EzTeams.allPlayers = dao.getMembers();
         if(DEBUG)
-            logger.info(plugin.teams.toString());
+            logger.info(EzTeams.teams.toString());
         //Init objects
         ds = new DataStorage();
 
@@ -81,17 +81,17 @@ public class Core {
             logger.debug(configMan.getConfig().toString());
     }
     private void registerCommands() {
-        CommandSpec teamJoinCommand = new TeamJoinCommand().buildTeamJoinCommand();
-        CommandSpec teamLeaveCommand = new TeamLeaveCommand().buildTeamLeaveCommand();
-        CommandSpec teamListCommand = new TeamListCommand().buildTeamListCommand();
+        CommandSpec teamJoinCommand = TeamJoinCommand.buildTeamJoinCommand();
+        CommandSpec teamLeaveCommand = TeamLeaveCommand.buildTeamLeaveCommand();
+        CommandSpec teamListCommand = TeamListCommand.buildTeamListCommand();
 
 
-        CommandSpec memberSetCommand = new AdminSetTeam().buildMemberSetTeam();
-        CommandSpec memberRemoveCommand = new AdminRemoveTeam().buildMemberRemoveTeam();
-        CommandSpec memberCountCommand = new MemberCountCommand().buildMemberCountCommand();
+        CommandSpec memberSetCommand = AdminSetTeam.buildMemberSetTeam();
+        CommandSpec memberRemoveCommand = AdminRemoveTeam.buildMemberRemoveTeam();
+        CommandSpec memberCountCommand = MemberCountCommand.buildMemberCountCommand();
 
-        CommandSpec memberPointsCommand = new AdminMemberPoints().buildAdminMemberPoints();
-        CommandSpec teamPointsCommand = new AdminTeamPoints().buildAdminTeamPoints();
+        CommandSpec memberPointsCommand = AdminMemberPoints.buildAdminMemberPoints();
+        CommandSpec teamPointsCommand = AdminTeamPoints.buildAdminTeamPoints();
 
         CommandSpec memberCommand = CommandSpec.builder()
                 .child(memberCountCommand,"count")
@@ -123,6 +123,8 @@ public class Core {
                 .child(adminCommand,"admin")
                 .child(teamJoinCommand,"points")
                 .build(),NAME.toLowerCase(),"team","teams");
+
+
         cmdSrvc.register(plugin,teamPointsCommand,"teampoints");
         cmdSrvc.register(plugin,memberPointsCommand,"memberpoints","playerpoints");
 
@@ -144,7 +146,7 @@ public class Core {
         if(temp == null) {
             logger.info("New Player joining!");
             temp = new Member(uuid, name);
-            plugin.allPlayers.add(temp);
+            EzTeams.allPlayers.add(temp);
             logger.info("Player added to all member list.");
         }
 
@@ -155,17 +157,17 @@ public class Core {
             logger.info("------------");
         }
 
-        plugin.onlineMembers.add(temp);
+        EzTeams.onlineMembers.add(temp);
     }
     public void ClientLeave(ClientConnectionEvent.Disconnect event){
         Player target = event.getTargetEntity();
         Member member = Utils.findMember(target.getName());
-        plugin.onlineMembers.remove(member);
+        EzTeams.onlineMembers.remove(member);
     }
 
     public void onServerStart() {
         logger.info("Starting AutoSave task");
-        plugin.getGame().getScheduler().createTaskBuilder()
+        EzTeams.getGame().getScheduler().createTaskBuilder()
                 .execute(new AutoSaveTask(configMan.getConfig(),plugin))
                 .name("EzTeamsAutoSave")
                 .interval(configMan.getConfig().db.getInterval(), TimeUnit.SECONDS)

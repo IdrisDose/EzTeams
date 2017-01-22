@@ -84,8 +84,17 @@ public class Member {
         savePlayer();
     }
     public void setMemberPoints(int points){
+        int oldPoints = this.getPoints();
+        Team team = this.getTeam();
         this.setPoints(points);
-        this.getTeam().setTeamPoints(points);
+        if(points<oldPoints){
+            int temp = oldPoints-points;
+            team.removeTeamPoints(temp);
+        } else if(points>oldPoints){
+            int temp = points-oldPoints;
+            team.addTeamPoints(temp);
+        }
+
         savePlayer();
     }
 

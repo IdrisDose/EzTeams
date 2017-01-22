@@ -66,6 +66,8 @@ public class AdminSetTeam {
                     }else {
                         Team temp = mem.getTeam();
                         mem.setTeam(team);
+                        mem.setMemberPoints(mem.getPoints());
+                        temp.removeTeamPoints(mem.getPoints());
                         mem.savePlayer();
 
                         if(!teamname.equals("default")) {
