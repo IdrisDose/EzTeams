@@ -20,6 +20,9 @@ public class DatabaseCategory extends ConfigCategory{
     @Setting(value="url",comment = "url for database")
     private String dbURL="jdbc:mysql://";
 
+    @Setting(value="save-interval",comment = "Interval in seconds between each save")
+    private int interval = 900;
+
     public String getDbPassword() {
         return dbPassword;
     }
@@ -29,4 +32,5 @@ public class DatabaseCategory extends ConfigCategory{
     public String getDbURL() {
         return dbURL;
     }
+    public int getInterval(){return interval;}
 }

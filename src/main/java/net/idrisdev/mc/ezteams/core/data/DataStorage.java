@@ -1,4 +1,4 @@
-package net.idrisdev.mc.ezteams.data;
+package net.idrisdev.mc.ezteams.core.data;
 
 import net.idrisdev.mc.ezteams.utils.Utils;
 

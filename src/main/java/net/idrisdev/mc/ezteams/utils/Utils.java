@@ -1,8 +1,8 @@
 package net.idrisdev.mc.ezteams.utils;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.data.entities.Member;
-import net.idrisdev.mc.ezteams.data.entities.Team;
+import net.idrisdev.mc.ezteams.core.entities.Member;
+import net.idrisdev.mc.ezteams.core.entities.Team;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
@@ -18,7 +18,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Identifiable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -134,26 +133,28 @@ public abstract class Utils {
         return PLUGIN_NAME.concat(Text.of(TextColors.GREEN).concat(Text.of(text)));
     }
 
+    public static void plainbroadcastAsConsole(String msg){
+        executeCmdAsConsole("plainbroadcast &4[&9"+Utils.NAME+"&4] &c"+msg);
+    }
+
     public static CommandElement stringarg(String name){
         return GenericArguments.string(Text.of(name));
     }
 
     public static Member findMember(String name) {
-        Member tempmem = null;
-        for(Member mem : EzTeams.players){
-            tempmem = mem.getName().equals(name)?mem:tempmem;
-        }
-        return tempmem;
+        return EzTeams.onlineMembers.stream().filter(member -> member.getName().equals(name)).findFirst().get();
     }
 
-    public static Team findTeam(String teamname) {
-        Team tmp = EzTeams.teams.get(1);
-        for(Team t : EzTeams.teams){
-            if(EzTeams.DEBUG)
-                logger.info("Team: "+t);
-            tmp = t.getName().toLowerCase().equals(teamname)?t:tmp;
+    public static Member findPastMember(String uuid) {
+        for(Member member : EzTeams.allPlayers){
+            if(member.getUuid().equals(uuid))
+                return member;
         }
-        return tmp;
+        return null;
+    }
+
+    public static Optional<Team> findTeam(String teamName) {
+        return EzTeams.teams.stream().filter(team -> team.getName().equals(teamName)).findFirst();
     }
 
     public static Team findTeam(int teamID) {
@@ -162,5 +163,15 @@ public abstract class Utils {
             tmp = t.getId()==teamID?t:tmp;
         }
         return tmp;
+    }
+
+    public static int findTeamCount(String teamName){
+        int count = 0;
+        Team team = findTeam(teamName).get();
+        for(Member member : EzTeams.allPlayers){
+            if(member.getTeam().equals(team))
+                count++;
+        }
+        return count;
     }
 }

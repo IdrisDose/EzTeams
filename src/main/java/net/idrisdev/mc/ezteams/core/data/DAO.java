@@ -1,9 +1,9 @@
-package net.idrisdev.mc.ezteams.data;
+package net.idrisdev.mc.ezteams.core.data;
 
 import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.config.Config;
-import net.idrisdev.mc.ezteams.data.entities.Member;
-import net.idrisdev.mc.ezteams.data.entities.Team;
+import net.idrisdev.mc.ezteams.core.entities.Member;
+import net.idrisdev.mc.ezteams.core.entities.Team;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -24,7 +24,7 @@ import static net.idrisdev.mc.ezteams.utils.Utils.NAME;
 public class DAO {
     private static EzTeams plugin = EzTeams.get();
     private static Logger logger = plugin.getLogger();
-    private Config config = plugin.getConfigManager().getConfig();
+    private Config config = plugin.core.getConfigManager().getConfig();
 
     private final String dbname="mysql-connector-java-6.0.5.jar";
     private final Path conf = Paths.get("config").resolve(NAME).resolve("database");
@@ -158,6 +158,8 @@ public class DAO {
         try {
             if (conn == null || conn.isClosed())
                 conn = getConnection();
+
+            logger.info("CONN isClosed()??: "+conn.isClosed());
             st = conn.createStatement();
 
             ResultSet resultSet = st.executeQuery(arguments);
@@ -264,6 +266,23 @@ public class DAO {
         }
         return tmpList;
     }
+    public List<Member> getMembers(){
+        ResultSet rs = executeQuery("select * from players");
+        List<Member> tmpList = new ArrayList<>();
+        try {
+            while(rs.next()){
+                String id = rs.getString("uuid");
+                String name = rs.getString("name");
+                int team = rs.getInt("team");
+                int points = rs.getInt("points");
+                tmpList.add(new Member(id,name,team,points));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tmpList;
+    }
     public boolean ifExists(String query){
         ResultSet rs= executeQuery(query);
         try {
@@ -325,7 +344,7 @@ public class DAO {
         String name = member.getName();
         int team = member.getTeam()==null?1:member.getTeam().getId();
         int points = member.getPoints();
-        PreparedStatement pst = null;
+        PreparedStatement pst;
         try {
             if (conn == null || conn.isClosed())
                 conn = getConnection();
@@ -349,5 +368,33 @@ public class DAO {
                 logger.error(DAO.class.getName()+" is broken, report to developer!");
             }
         }
+    }
+    public void saveTeam(Team team){
+        logger.info("Saving team with data: "+team);
+        int id = team.getId();
+        String name = team.getName();
+        int points = team.getPoints();
+
+        PreparedStatement pst;
+        try {
+            if(conn == null || conn.isClosed())
+                conn = getConnection();
+
+            pst = conn.prepareStatement("UPDATE teams SET name=?,points=? WHERE id=?");
+            pst.setString(1,name);
+            pst.setInt(2,points);
+            pst.setInt(3,id);
+
+            int i = pst.executeUpdate();
+            logger.info("Team saving returned with result: "+i);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            logger.error(DAO.class.getName()+" is broken, report to developer!");
+        }
+    }
+
+    public void saveAll() {
+        plugin.teams.forEach(this::saveTeam);
+        plugin.onlineMembers.forEach(member -> member.savePlayer());
     }
 }

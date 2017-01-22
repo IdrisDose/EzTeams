@@ -1,11 +1,10 @@
 package net.idrisdev.mc.ezteams.config.category.Teams;
 
-import net.idrisdev.mc.ezteams.data.entities.Member;
+import net.idrisdev.mc.ezteams.core.entities.Member;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**

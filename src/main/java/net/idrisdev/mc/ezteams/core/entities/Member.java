@@ -1,12 +1,8 @@
-package net.idrisdev.mc.ezteams.data.entities;
+package net.idrisdev.mc.ezteams.core.entities;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.data.DAO;
 import net.idrisdev.mc.ezteams.utils.Utils;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
-import static net.idrisdev.mc.ezteams.EzTeams.players;
-import static net.idrisdev.mc.ezteams.EzTeams.teams;
 
 /**
  * Created by Idris on 5/01/2017.
@@ -40,14 +36,14 @@ public class Member {
 
     public void savePlayer(){
         String query = "select * from players where uuid='"+this.uuid+"'";
-        if(plugin.getDao().ifExists(query))
-            plugin.getDao().updatePlayer(this);
+        if(plugin.core.getDao().ifExists(query))
+            plugin.core.getDao().updatePlayer(this);
         else
-            plugin.getDao().insertPlayer(this);
+            plugin.core.getDao().insertPlayer(this);
     }
 
     public void getPlayerData(String id){
-        Member container = plugin.getDao().getMemberData(id);
+        Member container = plugin.core.getDao().getMemberData(id);
         this.team = container.getTeam();
         this.points = container.getPoints();
 
@@ -75,6 +71,22 @@ public class Member {
     public void setTeam(Team team) {
         this.team = team;
 
+    }
+
+    public void addMemberPoints(int points){
+        this.setPoints(this.getPoints()+points);
+        this.getTeam().addTeamPoints(points);
+        savePlayer();
+    }
+    public void removeMemberPoints(int points){
+        this.setPoints(this.getPoints()-points);
+        this.getTeam().removeTeamPoints(points);
+        savePlayer();
+    }
+    public void setMemberPoints(int points){
+        this.setPoints(points);
+        this.getTeam().setTeamPoints(points);
+        savePlayer();
     }
 
     public int getPoints() {

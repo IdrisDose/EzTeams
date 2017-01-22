@@ -1,14 +1,11 @@
 package net.idrisdev.mc.ezteams.commands.teams.core;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.data.entities.Team;
+import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
 import net.idrisdev.mc.ezteams.utils.Utils;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Idris on 22/01/2017.
@@ -37,7 +34,7 @@ public class TeamListCommand {
                         }
 
                     }
-                    Utils.sendPrettyMessage(src,"------------------------------");
+                    Utils.sendPrettyMessage(src,"-----------------------------");
                     return CommandResult.success();
                 })
                 .build();
