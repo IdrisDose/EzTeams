@@ -5,17 +5,14 @@ import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Identifiable;
 
 import java.util.Optional;
@@ -77,46 +74,6 @@ public abstract class Utils {
         return consoleFakeUUID;
     }
 
-    public static Optional<OptionSubject> getSubject(User user) {
-        Subject subject = user.getContainingCollection().get(user.getIdentifier());
-        return subject instanceof OptionSubject ? Optional.of((OptionSubject) subject) : Optional.empty();
-    }
-
-    public Text getTextFromOption(CommandSource src, String option) {
-        if (src instanceof Player) {
-            Optional<OptionSubject> oos = getSubject((Player)src);
-            if (oos.isPresent()) {
-                Optional<String> optionString = oos.get().getOption(option);
-                if (optionString.isPresent()) {
-                    return TextSerializers.FORMATTING_CODE.deserialize(optionString.get());
-                }
-            }
-        }
-
-        return Text.EMPTY;
-    }
-
-    public Text getOption(User usr, String option) {
-            Optional<OptionSubject> oos = getSubject(usr);
-            if (oos.isPresent()) {
-                Optional<String> optionString = oos.get().getOption(option);
-                if (optionString.isPresent()) {
-                    return TextSerializers.FORMATTING_CODE.deserialize(optionString.get());
-                }
-            }
-        return Text.EMPTY;
-    }
-
-    public Optional<Player> getPlayer(UUID uuid){
-        Optional<Player> onlinePlayer = game.getServer().getPlayer(uuid);
-        Optional<UserStorageService> userStorage = game.getServiceManager().provide(UserStorageService.class);
-
-        if (onlinePlayer.isPresent()) {
-            return onlinePlayer;
-        }else{
-            return null;
-        }
-    }
 
     public void logInitMsg(String name){
         logger.info("Initializing "+name+".");
@@ -142,11 +99,11 @@ public abstract class Utils {
     }
 
     public static Member findMember(String name) {
-        return EzTeams.onlineMembers.stream().filter(member -> member.getName().equals(name)).findFirst().get();
+        return EzTeams.getOnlineMembers().stream().filter(member -> member.getName().equals(name)).findFirst().get();
     }
 
     public static Member findPastMember(String uuid) {
-        for(Member member : EzTeams.allPlayers){
+        for(Member member : EzTeams.getAllPlayers()){
             if(member.getUuid().equals(uuid))
                 return member;
         }
@@ -154,12 +111,12 @@ public abstract class Utils {
     }
 
     public static Optional<Team> findTeam(String teamName) {
-        return EzTeams.teams.stream().filter(team -> team.getName().equals(teamName)).findFirst();
+        return EzTeams.getTeams().stream().filter(team -> team.getName().equals(teamName)).findFirst();
     }
 
     public static Team findTeam(int teamID) {
-        Team tmp = EzTeams.teams.get(1);
-        for(Team t : EzTeams.teams){
+        Team tmp = EzTeams.getTeams().get(0);
+        for(Team t : EzTeams.getTeams()){
             tmp = t.getId()==teamID?t:tmp;
         }
         return tmp;
@@ -168,10 +125,24 @@ public abstract class Utils {
     public static int findTeamCount(String teamName){
         int count = 0;
         Team team = findTeam(teamName).get();
-        for(Member member : EzTeams.allPlayers){
+        for(Member member : EzTeams.getAllPlayers()){
             if(member.getTeam().equals(team))
                 count++;
         }
         return count;
     }
+
+    public static Optional<Player> getPlayer(UUID uuid) {
+        Optional<Player> onlinePlayer = Sponge.getServer().getPlayer(uuid);
+
+        if (onlinePlayer.isPresent()) {
+            return onlinePlayer;
+        }
+
+        Optional<UserStorageService> userStorage = Sponge.getServiceManager().provide(UserStorageService.class);
+
+        return userStorage.isPresent()?userStorage.get().get(uuid).get().getPlayer():null;
+    }
+
+
 }

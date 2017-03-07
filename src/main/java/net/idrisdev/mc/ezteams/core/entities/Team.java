@@ -1,26 +1,29 @@
 package net.idrisdev.mc.ezteams.core.entities;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 /**
  * Created by Idris on 5/01/2017.
  */
-@ConfigSerializable
 public class Team {
     private EzTeams plugin = EzTeams.get();
-
-
     private int id;
+
     private String name;
+
     private int points;
+
+    private String prefix;
 
     public Team(){}
 
-    public Team(int id, String name, int points) {
+    public Team(int id, String name, int points, String prefix) {
         this.id=id;
         this.name = name;
         this.points = points;
+        this.prefix = prefix;
     }
 
     public int getId() {
@@ -66,11 +69,21 @@ public class Team {
         plugin.core.getDao().saveTeam(this);
     }
 
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     @Override
     public String toString() {
-        return "Team{" +
+        return name+"{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name=" + name +
                 '}';
     }
+
+
 }

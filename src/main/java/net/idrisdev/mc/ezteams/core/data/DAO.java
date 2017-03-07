@@ -2,8 +2,10 @@ package net.idrisdev.mc.ezteams.core.data;
 
 import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.config.Config;
+import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
+import net.idrisdev.mc.ezteams.utils.Utils;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -26,15 +28,13 @@ public class DAO {
     private static Logger logger = plugin.getLogger();
     private Config config = plugin.core.getConfigManager().getConfig();
 
-    private final String dbname="mysql-connector-java-6.0.5.jar";
+    private final String dbname="h2-1.3.173.jar";
     private final Path conf = Paths.get("config").resolve(NAME).resolve("database");
     private final Path dbDriver = conf.resolve(dbname);
-    private static boolean madeConnection = false;
 
-    private String url = config.db.getDbURL();
-    private String uname = config.db.getDbUsername();
-    private String pword = config.db.getDbPassword();
 
+    private static final String playerTable = "PLAYERS";
+    private static final String teamTable = "TEAMS";
 
     Connection conn = null;
     Statement st = null;
@@ -43,71 +43,53 @@ public class DAO {
     public DAO() {}
 
     public void initDB(){
-        logger.info("Initializing Database Connectivity, ye cunt.");
         try {
-            if(plugin.DEBUG)
-                logger.info("USERNAME: "+uname+" PWORD: "+pword+" URL: "+url);
 
-
-            conn = getConnection();
+            conn=getConnection();
             st = conn.createStatement();
-            rs = st.executeQuery("SELECT VERSION()");
-
-            if(rs.next()){
-                logger.info("Version is: " + rs.getString(1));
-            } else {
-
-                logger.info("Nothing showed up fam");
+            rs = conn.getMetaData().getTables(null, null, playerTable, null);
+            if (!rs.next()) {
+                Utils.logger.error("Players table doesn't exist, making table");
+                //Temporarily ID is Varchar for later testing
+                st.execute("CREATE TABLE IF NOT EXISTS PLAYERS(UUID VARCHAR(36), NAME VARCHAR(255), TEAM INT(1), POINTS INT(10), PRIMARY KEY(UUID));");
+                Utils.logger.info("Made new PLAYER table.");
             }
 
+            conn=getConnection();
+            st=conn.createStatement();
+            rs = conn.getMetaData().getTables(null,null,teamTable, null );
+            if(!rs.next()){
+                Utils.logger.error("Teams table doesn't exist, making new table");
+                st.execute("CREATE TABLE IF NOT EXISTS TEAMS(ID INT(10), NAME VARCHAR(25), POINTS INT(10), PREFIX VARCHAR(200), PRIMARY KEY(ID));");
+                Utils.logger.info("Made new TEAMS table");
 
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             plugin.getLogger().error("Shits fuck in "+DAO.class.getName());
-        } finally {
-            try {
-
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (st != null) {
-                    st.close();
-                }
-
-                if (conn != null) {
-                    conn.close();
-                }
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                plugin.getLogger().error("Shits fuck in "+DAO.class.getName());
-            }
         }
     }
-
     public Connection getConnection() {
         try {
-            if (madeConnection && !conn.isClosed()) {
+            if (conn!=null && !conn.isClosed()) {
+                logger.info("Connection is not closed.");
                 return conn;
             } else {
-                if (!madeConnection) {
-                    File e = conf.toFile();
-                    if (!e.isDirectory())
-                        conf.toFile().mkdir();
 
-                    logger.info("Loading database driver.");
-                    Class.forName("com.mysql.jdbc.Driver");
-                    logger.info("Establishing connection.");
-                }
+                File e = conf.toFile();
+                if (!e.isDirectory())
+                    conf.toFile().mkdir();
+
+                logger.info("Loading database driver.");
+                Class.forName("org.h2.Driver");
+                logger.info("Establishing connection.");
+
 
                 if (!dbDriver.toFile().exists()) {
+                    logger.info("dbDriver does not exist, making.");
                     copyDriverFromJar();
                 }
-
-                conn = DriverManager.getConnection(url,uname,pword);;
-                madeConnection = true;
-                return conn;
+                return DriverManager.getConnection("jdbc:h2:./config/" + NAME + "/database/" + NAME + ";MVCC=true");
             }
         } catch (ClassNotFoundException | SQLException e) {
             logger.info("Could not get a connection to database.");
@@ -131,63 +113,49 @@ public class DAO {
             fos2.close();
         } catch (Exception var4) {
             logger.info("Failed to extract driver.");
-        } finally {
-            try {
-
-                if (rs != null) {
-                    rs.close();
-                }
-
-                if (st != null) {
-                    st.close();
-                }
-
-                if (conn != null) {
-                    conn.close();
-                }
-
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                plugin.getLogger().error(DAO.class.getName()+" is broken, report to developer!");
-            }
         }
 
     }
 
     private ResultSet executeQuery(String arguments) {
         try {
-            if (conn == null || conn.isClosed())
+            Core.debug("Is connection closed? "+conn.isClosed());
+            if (conn == null || conn.isClosed()) {
                 conn = getConnection();
+            }
+            Core.debug("Is connection closed now? "+conn.isClosed());
 
-            logger.info("CONN isClosed()??: "+conn.isClosed());
             st = conn.createStatement();
 
             ResultSet resultSet = st.executeQuery(arguments);
 
+            Core.debug("Closing connections.");
+
+            rs.close();
             conn.close();
             st.close();
+
+            Core.debug("Connections Closed.");
 
             return resultSet;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
-        }finally {
             try {
-                if (rs != null) {
+                Core.debug("ERROR OCCURRED executeQuery, Connection Closing.");
+
+                if(rs!=null)
                     rs.close();
-                }
-
-                if(conn !=null){
+                if(conn!=null)
                     conn.close();
-                }
-
-                if(st !=null){
+                if(st!=null)
                     st.close();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                logger.error(DAO.class.getName()+" is broken, report to developer!");
+
+                Core.debug("ERROR OCCURRED executeQuery, Connection Closed.");
+            } catch (SQLException e1) {
+                e1.printStackTrace();
             }
+
+            return null;
         }
     }
     private int executeUQuery(String arguments) {
@@ -224,60 +192,58 @@ public class DAO {
         }
     }
     public Member getMemberData(String uuid){
-        ResultSet rs = executeQuery("select name,team,points from players where uuid='"+uuid+"'");
+        //ResultSet rs = executeQuery("select name,team,points from players where uuid='"+uuid+"'");
+        ResultSet rs = executeQuery("SELECT NAME,TEAM,POINTS FROM PLAYERS WHERE UUID = '"+uuid+"'");
         String name = "";
         int team = 0;
         int points = 0;
 
         try {
             if(rs.next()) {
-                name = rs.getString("name");
-                team = rs.getInt("team");
-                points = rs.getInt("points");
+                name = rs.getString("NAME");
+                team = rs.getInt("TEAM");
+                points = rs.getInt("POINTS");
             }
+
+            Core.debug("getMemData: Connection Closing.");
+
             rs.close();
+            conn.close();
+            st.close();
+
+            Core.debug("getMemData: Connection Closed.");
         } catch (SQLException e) {
             e.printStackTrace();
-        }finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                logger.error(DAO.class.getName()+" is broken, report to developer!");
-            }
         }
         return new Member(uuid,name,team,points);
     }
     public List<Team> getTeams(){
-        ResultSet rs = executeQuery("select * from teams");
+        ResultSet rs = executeQuery("SELECT * FROM TEAMS");
         List<Team> tmpList = new ArrayList<>();
         try {
             while(rs.next()){
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                int points = rs.getInt("points");
-                tmpList.add(new Team(id,name,points));
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
+                int points = rs.getInt("POINTS");
+                String prefix = rs.getString("PREFIX");
+                tmpList.add(new Team(id,name,points,prefix));
             }
-            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return tmpList;
     }
     public List<Member> getMembers(){
-        ResultSet rs = executeQuery("select * from players");
+        ResultSet rs = executeQuery("SELECT * FROM PLAYERS");
         List<Member> tmpList = new ArrayList<>();
         try {
             while(rs.next()){
-                String id = rs.getString("uuid");
-                String name = rs.getString("name");
-                int team = rs.getInt("team");
-                int points = rs.getInt("points");
+                String id = rs.getString("UUID");
+                String name = rs.getString("NAME");
+                int team = rs.getInt("TEAM");
+                int points = rs.getInt("POINTS");
                 tmpList.add(new Member(id,name,team,points));
             }
-            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -303,7 +269,7 @@ public class DAO {
         return false;
     }
     public void updatePlayer(Member member){
-        logger.info("UPDATING PLAYER DATA!");
+        Core.debug("UPDATING PLAYER DATA!");
 
 
         String uuid = member.getUuid();
@@ -316,7 +282,7 @@ public class DAO {
                 conn = getConnection();
 
 
-            pst = conn.prepareStatement("UPDATE players SET name=?,team=?,points=? where uuid=?");
+            pst = conn.prepareStatement("UPDATE PLAYERS SET NAME=?,TEAM=?,POINTS=? WHERE UUID=?");
             pst.setString(1,name);
             pst.setInt(2,team);
             pst.setInt(3,points);
@@ -338,7 +304,7 @@ public class DAO {
         }
     }
     public void insertPlayer(Member member){
-        logger.info("Inserting new player!");
+        Core.debug("Inserting new player!");
 
         String uuid = member.getUuid();
         String name = member.getName();
@@ -349,7 +315,7 @@ public class DAO {
             if (conn == null || conn.isClosed())
                 conn = getConnection();
 
-            pst = conn.prepareStatement("INSERT INTO players (uuid,name,team,points) VALUES(?,?,?,?)");
+            pst = conn.prepareStatement("INSERT INTO PLAYERS (UUID,NAME,TEAM,POINTS) VALUES(?,?,?,?)");
             pst.setString(1,uuid);
             pst.setString(2,name);
             pst.setInt(3,team);
@@ -370,7 +336,7 @@ public class DAO {
         }
     }
     public void saveTeam(Team team){
-        logger.info("Saving team with data: "+team);
+        Core.debug("Saving team with data: "+team);
         int id = team.getId();
         String name = team.getName();
         int points = team.getPoints();
@@ -380,13 +346,13 @@ public class DAO {
             if(conn == null || conn.isClosed())
                 conn = getConnection();
 
-            pst = conn.prepareStatement("UPDATE teams SET name=?,points=? WHERE id=?");
+            pst = conn.prepareStatement("UPDATE TEAM SET NAME=?,POINTS=? WHERE id=?");
             pst.setString(1,name);
             pst.setInt(2,points);
             pst.setInt(3,id);
 
             int i = pst.executeUpdate();
-            logger.info("Team saving returned with result: "+i);
+            Core.debug("Team saving returned with result: "+i);
         } catch (SQLException e) {
             e.printStackTrace();
             logger.error(DAO.class.getName()+" is broken, report to developer!");
@@ -394,7 +360,7 @@ public class DAO {
     }
 
     public void saveAll() {
-        plugin.teams.forEach(this::saveTeam);
-        plugin.onlineMembers.forEach(member -> member.savePlayer());
+        plugin.getTeams().forEach(this::saveTeam);
+        plugin.getOnlineMembers().forEach(member -> member.savePlayer());
     }
 }

@@ -12,47 +12,31 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Idris on 22/01/2017.
  */
-public class AdminSetTeam {
-
+public class AdminRemoveFromTeam {
     private static EzTeams plugin = EzTeams.get();
-    private static List<String> currentTeams = new ArrayList<>();
-    public AdminSetTeam() {
+
+    public AdminRemoveFromTeam() {
     }
 
-    public static CommandSpec buildMemberSetTeam() {
+    public static CommandSpec buildMemberRemoveTeam() {
         return CommandSpec.builder()
-                .permission(Permissions.TEAMS_ADMIN_ADD)
-                .description(Utils.getCmdDescription("Force a member into a team."))
+                .permission(Permissions.TEAMS_ADMIN_REMOVE)
+                .description(Utils.getCmdDescription("For those who wish to abandon the greate cause."))
                 .arguments(
-                        GenericArguments.onlyOne(GenericArguments.player(Text.of("target"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("team")))
-
+                        GenericArguments.onlyOne(GenericArguments.player(Text.of("target")))
                 )
                 .executor((src, args) -> {
+                    String teamname = "default";
                     Player target = args.<Player>getOne("target").get();
-                    String teamname = args.<String>getOne("team").get();
-                    teamname = teamname.toLowerCase();
 
-                    if(!currentTeams.contains(teamname)){
-                        Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
-                        return CommandResult.empty();
-                    } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
-                        Utils.sendSrcErrorMessage(src,"You are not allowed to join the staff team.");
-                        return CommandResult.empty();
-                    } if(!(src instanceof Player)){
+                    if(!(src instanceof Player)){
                         Utils.sendSrcErrorMessage(src,"Only onlineMembers allowed to execute this command!");
                         return CommandResult.empty();
-                    } else if(teamname.equals("default")){
-                        Utils.sendSrcErrorMessage(src,"One does not join team default, one must use team leave.");
-                        return CommandResult.empty();
-                    }
 
+                    }
 
 
                     Member mem = Utils.findMember(target.getName());
@@ -68,13 +52,13 @@ public class AdminSetTeam {
                     }else {
                         Team temp = mem.getTeam();
                         mem.setTeam(team);
+                        mem.setPoints(0);
                         mem.savePlayer();
+                        Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
 
-                        if(!teamname.equals("default")) {
-                            Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
-                            Utils.executeCmdAsConsole("puadd " + src.getName() + " " + teamname);
-                        }
                     }
+
+                    Utils.executeCmdAsConsole("plainbroadcast &4[&9"+Utils.NAME+"&4] &c"+mem.getName()+" has been removed from their team, they now have 0 points.");
                     return CommandResult.success();
                 })
                 .build();

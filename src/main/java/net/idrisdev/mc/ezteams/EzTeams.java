@@ -40,10 +40,9 @@ public class EzTeams {
     public static final String MODID = Core.MODID;
     public static final String NAME = Core.NAME;
     public static final String VERSION = Core.VERSION;
-    public static final boolean DEBUG = Core.DEBUG;
-    public static List<Team> teams = new ArrayList<>();
-    public static List<Member> onlineMembers = new LinkedList<>();
-    public static List<Member> allPlayers = new LinkedList<>();
+    private static List<Team> teams = new ArrayList<>();
+    private static List<Member> onlineMembers = new LinkedList<>();
+    private static List<Member> allPlayers = new LinkedList<>();
 
     //shit for plugins
     private static EzTeams plugin;
@@ -113,12 +112,27 @@ public class EzTeams {
     }
 
     @Listener
-    public void onStopping(GameStoppingEvent event){
-        logger.info("Stopping Server fam. 1");
+    public void onStoppingServer(GameStoppingServerEvent event){
+        core.gameStoppingServer();
     }
 
-    @Listener
-    public void onStoppingServer(GameStoppingServerEvent event){
-        logger.info("Stopping Server fam. 2");
+    public static List<Team> getTeams() {
+        return teams;
+    }
+    public static void setTeams(List<Team> teams) {
+        EzTeams.teams = teams;
+    }
+    public static List<Member> getOnlineMembers() {
+        return onlineMembers;
+    }
+    public static void setOnlineMembers(List<Member> onlineMembers) {
+        EzTeams.onlineMembers = onlineMembers;
+    }
+
+    public static List<Member> getAllPlayers() {
+        return allPlayers;
+    }
+    public static void setAllPlayers(List<Member> allPlayers) {
+        EzTeams.allPlayers = allPlayers;
     }
 }

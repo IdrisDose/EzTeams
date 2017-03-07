@@ -29,6 +29,9 @@ public class Permissions {
     public static final String TEAMS_ADMIN_TEAM_POINS = Utils.NAME +".admin.team.points";
     public static final String TEAMS_ADMIN_MEMBER_POINS = Utils.NAME +".admin.member.points";
 
+    public static final String TEAMS_ADMIN_REMOVE_TEAM = Utils.NAME +".admin.team.remove";
+    public static final String TEAMS_ADMIN_ADD_TEAM = Utils.NAME +".admin.team.add";
+
     // OTHER
     public static List<String> names = java.util.Arrays.asList("Obeliskthegreat", "Idris_", "Ozzybuns");
     public static final String TEAMS_JOIN_STAFF = Utils.NAME +".team.staff";

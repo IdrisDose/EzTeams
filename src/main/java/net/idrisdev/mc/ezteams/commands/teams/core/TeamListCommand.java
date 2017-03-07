@@ -24,7 +24,7 @@ public class TeamListCommand {
                 .arguments()
                 .executor((src, args) -> {
                     Utils.sendPrettyMessage(src,"----Current Team Standings-----");
-                    for(Team team:plugin.teams){
+                    for(Team team:plugin.getTeams()){
 
                         String name = team.getName();
                         int points = team.getPoints();

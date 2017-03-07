@@ -1,5 +1,6 @@
 package net.idrisdev.mc.ezteams.config.category;
 
+import net.idrisdev.mc.ezteams.core.entities.Team;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -13,9 +14,8 @@ import java.util.List;
 @ConfigSerializable
 public class TeamsCategory extends ConfigCategory{
 
-    @Setting(value= "teamlist",comment = "Best not to change this, it might break things")
-    private List<String> teams = Arrays.asList("default","aqua","magma","rocket","plasma","galactic","staff");
 
+    private List<String> teams = Arrays.asList("default","aqua","magma","rocket","plasma","galactic","staff");
 
     public List<String> getTeams() {
         return teams;

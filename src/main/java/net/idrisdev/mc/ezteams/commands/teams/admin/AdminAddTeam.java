@@ -12,21 +12,19 @@ import org.spongepowered.api.text.format.TextColors;
 /**
  * Created by Idris on 7/03/2017.
  */
-public class AdminRemoveTeam {
+public class AdminAddTeam {
 
     private static EzTeams plugin = EzTeams.get();
 
-    public AdminRemoveTeam() {
+    public AdminAddTeam() {
     }
 
-    public static CommandSpec buildAdminRemoveTeam() {
+    public static CommandSpec buildAdminAddTeam() {
         return CommandSpec.builder()
-                .permission(Permissions.TEAMS_ADMIN_REMOVE_TEAM)
-                .description(Utils.getCmdDescription("Removes a team. PERMANENTLY DELETING ALL OF IT'S DATA."))
+                .permission(Permissions.TEAMS_ADMIN_ADD_TEAM)
+                .description(Utils.getCmdDescription("Add a team to the rankings!"))
                 .arguments()
                 .executor((src, args) -> {
-
-
                     return CommandResult.empty();
                 })
                 .build();

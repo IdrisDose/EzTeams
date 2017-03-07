@@ -11,10 +11,10 @@ public class DatabaseCategory extends ConfigCategory{
     @Setting(value="enabled",comment = "Use DB for datastorage? dafault:true")
     public boolean useDB = true;
 
-    @Setting(value= "password", comment="Password for Database")
+    @Setting(value= "conn-password", comment="Password for Database")
     private String dbPassword = "";
 
-    @Setting(value = "username", comment="username for database")
+    @Setting(value = "conn-username", comment="username for database")
     private String dbUsername = "";
 
     @Setting(value="url",comment = "url for database")

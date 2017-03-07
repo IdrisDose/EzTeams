@@ -1,17 +1,13 @@
 package net.idrisdev.mc.ezteams.core;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.commands.teams.admin.AdminMemberPoints;
-import net.idrisdev.mc.ezteams.commands.teams.admin.AdminRemoveTeam;
-import net.idrisdev.mc.ezteams.commands.teams.admin.AdminSetTeam;
-import net.idrisdev.mc.ezteams.commands.teams.admin.AdminTeamPoints;
+import net.idrisdev.mc.ezteams.commands.teams.admin.*;
 import net.idrisdev.mc.ezteams.commands.teams.core.TeamJoinCommand;
 import net.idrisdev.mc.ezteams.commands.teams.core.TeamLeaveCommand;
 import net.idrisdev.mc.ezteams.commands.teams.core.TeamListCommand;
 import net.idrisdev.mc.ezteams.commands.teams.member.MemberCountCommand;
 import net.idrisdev.mc.ezteams.config.ConfigManager;
 import net.idrisdev.mc.ezteams.core.data.DAO;
-import net.idrisdev.mc.ezteams.core.data.DataStorage;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.tasks.AutoSaveTask;
 import net.idrisdev.mc.ezteams.utils.Permissions;
@@ -34,11 +30,10 @@ public class Core {
     public static final String VERSION = "0.9a";
     public static final String NAME = "EzTeams";
     public static final String MODID = "ezteams";
-    public static final boolean DEBUG = true;
-    private EzTeams plugin;
+    public static boolean DEBUG;
+    private static EzTeams plugin;
 
     private CommandManager cmdSrvc = EzTeams.getGame().getCommandManager();
-    private DataStorage ds;
     private ConfigManager configMan;
     private DAO dao;
 
@@ -51,18 +46,29 @@ public class Core {
         this.plugin = plugin;
         this.confFile = confFile;
         this.configManager = configManager;
+        configMan = new ConfigManager(configManager,confFile);
     }
+    public void preInitPlugin() {
+        logger.info("Starting "+NAME+" v"+VERSION+" reading from Config!");
+        configMan.load();
+        DEBUG = configMan.getConfig().getDebug();
+    }
+
     public void initPlugin() {
         //Send init message to logger!
         logger.info("EzTeams " + VERSION + " INITIALIZING!");
         dao = new DAO();
-        plugin.teams = dao.getTeams();
-        plugin.allPlayers = dao.getMembers();
-        if(DEBUG)
-            logger.info(plugin.teams.toString());
-        //Init objects
-        ds = new DataStorage();
 
+        logger.info("Initializing DAO.");
+        dao.initDB();
+
+        logger.info("Loading Teams");
+        EzTeams.setTeams(dao.getTeams());
+
+        logger.info("Loading Past Players.");
+        EzTeams.setAllPlayers(dao.getMembers());
+
+        debug(EzTeams.getTeams().toString());
 
         //init filemanager
         Utils.fm.init();
@@ -72,27 +78,20 @@ public class Core {
         //Build and register commands
         registerCommands();
     }
-    public void preInitPlugin() {
-        logger.info("Starting "+NAME+" v"+VERSION+" reading from Config!");
 
-        configMan = new ConfigManager(configManager,confFile);
-        configMan.load();
-        if(DEBUG)
-            logger.debug(configMan.getConfig().toString());
-    }
     private void registerCommands() {
-        CommandSpec teamJoinCommand = new TeamJoinCommand().buildTeamJoinCommand();
-        CommandSpec teamLeaveCommand = new TeamLeaveCommand().buildTeamLeaveCommand();
-        CommandSpec teamListCommand = new TeamListCommand().buildTeamListCommand();
+        CommandSpec teamJoinCommand = TeamJoinCommand.buildTeamJoinCommand();
+        CommandSpec teamLeaveCommand = TeamLeaveCommand.buildTeamLeaveCommand();
+        CommandSpec teamListCommand = TeamListCommand.buildTeamListCommand();
 
 
-        CommandSpec memberSetCommand = new AdminSetTeam().buildMemberSetTeam();
-        CommandSpec memberRemoveCommand = new AdminRemoveTeam().buildMemberRemoveTeam();
-        CommandSpec memberCountCommand = new MemberCountCommand().buildMemberCountCommand();
+        CommandSpec memberSetCommand = AdminSetTeam.buildMemberSetTeam();
+        CommandSpec memberRemoveCommand = AdminRemoveFromTeam.buildMemberRemoveTeam();
+        CommandSpec memberCountCommand = MemberCountCommand.buildMemberCountCommand();
 
-        CommandSpec memberPointsCommand = new AdminMemberPoints().buildAdminMemberPoints();
-        CommandSpec teamPointsCommand = new AdminTeamPoints().buildAdminTeamPoints();
-
+        CommandSpec memberPointsCommand = AdminMemberPoints.buildAdminMemberPoints();
+        CommandSpec teamPointsCommand = AdminTeamPoints.buildAdminTeamPoints();
+        CommandSpec adminInvenCommand = AdminInventoryTest.buildAdminInventoryTest();
         CommandSpec memberCommand = CommandSpec.builder()
                 .child(memberCountCommand,"count")
                 .permission(Permissions.TEAMS_MEMBER_BASE)
@@ -125,6 +124,7 @@ public class Core {
                 .build(),NAME.toLowerCase(),"team","teams");
         cmdSrvc.register(plugin,teamPointsCommand,"teampoints");
         cmdSrvc.register(plugin,memberPointsCommand,"memberpoints","playerpoints");
+        cmdSrvc.register(plugin,adminInvenCommand,"invsee");
 
 
     }
@@ -144,7 +144,7 @@ public class Core {
         if(temp == null) {
             logger.info("New Player joining!");
             temp = new Member(uuid, name);
-            plugin.allPlayers.add(temp);
+            plugin.getAllPlayers().add(temp);
             logger.info("Player added to all member list.");
         }
 
@@ -155,12 +155,12 @@ public class Core {
             logger.info("------------");
         }
 
-        plugin.onlineMembers.add(temp);
+        plugin.getOnlineMembers().add(temp);
     }
     public void ClientLeave(ClientConnectionEvent.Disconnect event){
         Player target = event.getTargetEntity();
         Member member = Utils.findMember(target.getName());
-        plugin.onlineMembers.remove(member);
+        plugin.getOnlineMembers().remove(member);
     }
 
     public void onServerStart() {
@@ -171,5 +171,17 @@ public class Core {
                 .interval(configMan.getConfig().db.getInterval(), TimeUnit.SECONDS)
                 .submit(plugin);
         logger.info("Completed loading AutoSaveTask");
+    }
+
+    public void gameStoppingServer() {
+        new AutoSaveTask(configMan.getConfig(),plugin).run();
+    }
+
+    public static void debug(String msg) {
+        if(DEBUG){
+            EzTeams plugin = EzTeams.get();
+            plugin.getLogger().info(msg);
+        }
+
     }
 }
