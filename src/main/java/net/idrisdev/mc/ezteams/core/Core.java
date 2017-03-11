@@ -86,7 +86,8 @@ public class Core {
 
 
         CommandSpec memberSetCommand = AdminSetTeam.buildMemberSetTeam();
-        CommandSpec memberRemoveCommand = AdminRemoveFromTeam.buildMemberRemoveTeam();
+
+        CommandSpec memberRemoveCommand = AdminRemoveTeam.buildAdminRemoveTeam();
         CommandSpec memberCountCommand = MemberCountCommand.buildMemberCountCommand();
 
         CommandSpec memberPointsCommand = AdminMemberPoints.buildAdminMemberPoints();
@@ -122,6 +123,8 @@ public class Core {
                 .child(adminCommand,"admin")
                 .child(teamJoinCommand,"points")
                 .build(),NAME.toLowerCase(),"team","teams");
+
+
         cmdSrvc.register(plugin,teamPointsCommand,"teampoints");
         cmdSrvc.register(plugin,memberPointsCommand,"memberpoints","playerpoints");
         cmdSrvc.register(plugin,adminInvenCommand,"invsee");
@@ -145,6 +148,7 @@ public class Core {
             logger.info("New Player joining!");
             temp = new Member(uuid, name);
             plugin.getAllPlayers().add(temp);
+
             logger.info("Player added to all member list.");
         }
 
@@ -155,17 +159,20 @@ public class Core {
             logger.info("------------");
         }
 
+
         plugin.getOnlineMembers().add(temp);
+
     }
     public void ClientLeave(ClientConnectionEvent.Disconnect event){
         Player target = event.getTargetEntity();
         Member member = Utils.findMember(target.getName());
+
         plugin.getOnlineMembers().remove(member);
     }
 
     public void onServerStart() {
         logger.info("Starting AutoSave task");
-        plugin.getGame().getScheduler().createTaskBuilder()
+        EzTeams.getGame().getScheduler().createTaskBuilder()
                 .execute(new AutoSaveTask(configMan.getConfig(),plugin))
                 .name("EzTeamsAutoSave")
                 .interval(configMan.getConfig().db.getInterval(), TimeUnit.SECONDS)

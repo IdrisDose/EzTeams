@@ -48,7 +48,7 @@ public class TeamLeaveCommand {
                     }else {
                         Team temp = mem.getTeam();
                         mem.setTeam(team);
-                        mem.setPoints(0);
+                        mem.setMemberPoints(0);
                         mem.savePlayer();
                         Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
 
