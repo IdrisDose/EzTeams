@@ -21,7 +21,7 @@ public class MemberCountCommand {
 
     public static CommandSpec buildMemberCountCommand() {
         return CommandSpec.builder()
-                .permission(Permissions.TEAMS_MEMBER_LIST)
+                .permission(Permissions.TEAMS_MEMBER_COUNT)
                 .description(Utils.getCmdDescription("View the count of a specific team or all teams"))
                 .arguments(
                         GenericArguments.optional(GenericArguments.string(Text.of("team")))

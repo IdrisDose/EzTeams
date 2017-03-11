@@ -1,4 +1,4 @@
-package net.idrisdev.mc.ezteams.commands.teams.admin;
+package net.idrisdev.mc.ezteams.commands.teams.core;
 
 import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.utils.Permissions;
@@ -10,22 +10,25 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 /**
- * Created by Idris on 7/03/2017.
+ * Created by Idris on 11/03/2017.
  */
-public class AdminAddTeam {
+public class HelpCommand {
 
     private static EzTeams plugin = EzTeams.get();
 
-    public AdminAddTeam() {
+    public HelpCommand() {
     }
 
-    public static CommandSpec buildAdminAddTeam() {
+    public static CommandSpec buildHelpCommand() {
         return CommandSpec.builder()
-                .permission(Permissions.TEAMS_ADMIN_ADD_TEAM)
-                .description(Utils.getCmdDescription("Add a team to the rankings!"))
+                .permission(Permissions.TEAMS_BASE)
+                .description(Utils.getCmdDescription("Help for teams"))
                 .arguments()
                 .executor((src, args) -> {
-                    return CommandResult.empty();
+                    Utils.sendPrettyMessage(src,"----EzTeams Help----");
+                    Utils.sendPrettyMessage(src,"-See <Website> for command docs-");
+                    Utils.sendPrettyMessage(src,"-------------------");
+                    return CommandResult.success();
                 })
                 .build();
     }

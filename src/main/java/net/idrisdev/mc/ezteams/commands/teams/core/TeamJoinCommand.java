@@ -15,19 +15,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static net.idrisdev.mc.ezteams.utils.Utils.searchTeamsForName;
+
 /**
  * Created by Idris on 22/01/2017.
  */
 public class TeamJoinCommand {
 
     private static EzTeams plugin = EzTeams.get();
-    private static List<String> currentTeams = new ArrayList<>();
 
     public TeamJoinCommand() {
-        //Get all current team names and add them to the list.
-        currentTeams.addAll(EzTeams.getTeams().stream().map(Team::getName).collect(Collectors.toList()));
-    }
 
+    }
     public static CommandSpec buildTeamJoinCommand() {
         return CommandSpec.builder()
                 .permission(Permissions.TEAMS_JOIN)
@@ -39,7 +38,7 @@ public class TeamJoinCommand {
                     String teamname = args.<String>getOne("team").get();
                     teamname=teamname.toLowerCase();
 
-                    if(!currentTeams.contains(teamname)){
+                    if(!searchTeamsForName(teamname)){
                         Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
                         return CommandResult.empty();
                     } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
@@ -71,9 +70,15 @@ public class TeamJoinCommand {
                         mem.savePlayer();
 
                         if(!teamname.equals("default")) {
+                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
+                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta set team "+team.getPrefix());
+                            /*
                             Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
                             Utils.executeCmdAsConsole("puadd " + src.getName() + " " + teamname);
+                            */
                         }
+
+                        Utils.sendPrettyMessage(src,"Successfully join team "+teamname);
                     }
                     return CommandResult.success();
                 })

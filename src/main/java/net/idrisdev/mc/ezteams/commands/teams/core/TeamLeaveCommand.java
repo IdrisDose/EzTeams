@@ -50,8 +50,8 @@ public class TeamLeaveCommand {
                         mem.setTeam(team);
                         mem.setMemberPoints(0);
                         mem.savePlayer();
-                        Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
-
+                        //Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
+                        Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
                     }
 
                     Utils.executeCmdAsConsole("plainbroadcast &4[&9"+Utils.NAME+"&4] &c"+mem.getName()+" has abandoned their team, they now have 0 points.");

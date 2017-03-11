@@ -15,6 +15,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Identifiable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +29,7 @@ public abstract class Utils {
     public static final UUID consoleFakeUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     public static Logger logger = EzTeams.get().getLogger();
     public static final String NAME = EzTeams.NAME;
+    public static final String PERM_NAME = "ezteams";
     protected static final Text PLUGIN_NAME=Text.of(DARK_RED,"[",BLUE, NAME,DARK_RED,"]");
     public static final String NOCMDPERM = "You dont have the correct permissions!";
     public static final String getVersion(){return EzTeams.VERSION; }
@@ -145,4 +147,22 @@ public abstract class Utils {
     }
 
 
+    public static boolean searchTeamsForName(String team) {
+        List<Team> tmpList = EzTeams.getTeams();
+        for(Team t : tmpList){
+            if(t.getName().equalsIgnoreCase(team)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Team getTeam(String teamName) {
+        List<Team> tmpList = EzTeams.getTeams();
+        for(Team t : tmpList){
+            if(t.getName().equalsIgnoreCase(teamName))
+                return t;
+        }
+        return null;
+    }
 }

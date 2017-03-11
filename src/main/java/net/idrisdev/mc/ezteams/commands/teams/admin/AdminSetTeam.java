@@ -36,7 +36,7 @@ public class AdminSetTeam {
                 )
                 .executor((src, args) -> {
                     Player target = args.<Player>getOne("target").get();
-                    String teamname = args.<String>getOne("team").get();
+                    String teamname = args.<String>getOne("team").get().toLowerCase();
                     teamname = teamname.toLowerCase();
 
                     if(!currentTeams.contains(teamname)){
@@ -73,8 +73,12 @@ public class AdminSetTeam {
                         mem.savePlayer();
 
                         if(!teamname.equals("default")) {
+                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
+                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta set team "+team.getPrefix());
+                            /*
                             Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
                             Utils.executeCmdAsConsole("puadd " + src.getName() + " " + teamname);
+                            */
                         }
                     }
                     return CommandResult.success();
