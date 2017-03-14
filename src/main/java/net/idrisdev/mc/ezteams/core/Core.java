@@ -2,17 +2,13 @@ package net.idrisdev.mc.ezteams.core;
 
 import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.commands.teams.admin.*;
-import net.idrisdev.mc.ezteams.commands.teams.core.HelpCommand;
-import net.idrisdev.mc.ezteams.commands.teams.core.TeamJoinCommand;
-import net.idrisdev.mc.ezteams.commands.teams.core.TeamLeaveCommand;
-import net.idrisdev.mc.ezteams.commands.teams.core.TeamListCommand;
+import net.idrisdev.mc.ezteams.commands.teams.core.*;
 import net.idrisdev.mc.ezteams.commands.teams.member.MemberCountCommand;
 import net.idrisdev.mc.ezteams.commands.teams.member.MemberPointsCommand;
 import net.idrisdev.mc.ezteams.commands.teams.sudo.AdminCreateTeam;
 import net.idrisdev.mc.ezteams.commands.teams.sudo.AdminDeleteTeam;
 import net.idrisdev.mc.ezteams.commands.teams.sudo.SudoResetTeams;
 import net.idrisdev.mc.ezteams.commands.teams.sudo.TeamSetPrefix;
-import net.idrisdev.mc.ezteams.config.Config;
 import net.idrisdev.mc.ezteams.config.ConfigManager;
 import net.idrisdev.mc.ezteams.core.data.DAO;
 import net.idrisdev.mc.ezteams.core.entities.Member;
@@ -24,6 +20,9 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -101,6 +100,7 @@ public class Core {
         CommandSpec teamListCommand = TeamListCommand.buildTeamListCommand();
         CommandSpec memberMyPoints = MemberPointsCommand.buildMemberPointsCommand();
         CommandSpec helpCommand = HelpCommand.buildHelpCommand();
+        CommandSpec bugReport = BugReport.buildbugreport();
 
         //Admin Team Commands
         /**
@@ -140,6 +140,7 @@ public class Core {
 
         CommandSpec adminCommand = CommandSpec.builder()
                 .permission(Permissions.TEAMS_ADMIN)
+                .executor((src, args) -> executeAdminHelp(src,args))
                 .child(memberSetCommand, "add","set")
                 .child(memberRemoveCommand,"remove")
                 .child(teamAdminListCommand,"list")
@@ -150,6 +151,7 @@ public class Core {
 
         CommandSpec sudoCommand = CommandSpec.builder()
                 .permission(Permissions.TEAMS_SUDO)
+                .executor((src, args) -> executeSudoHelp(src,args))
                 .child(teamCreate, "create")
                 .child(teamDelete, "delete")
                 .child(teamReset, "reset")
@@ -162,16 +164,83 @@ public class Core {
         cmdSrvc.register(plugin, CommandSpec.builder()
                 .description(Utils.getCmdDescription("The core team management command."))
                 .permission(Permissions.TEAMS_BASE)
+                .executor((src, args) -> executeBaseHelp(src,args))
                 .child(teamJoinCommand,"join")
                 .child(teamLeaveCommand, "leave")
                 .child(teamListCommand, "list", "standings")
                 .child(memberMyPoints,"mypoints","points")
-                .child(helpCommand,"help","?")
+                .child(bugReport,"bug","bugreport", "report")
                 .build(),NAME.toLowerCase(),"team","teams");
 
         cmdSrvc.register(plugin,adminCommand,"teamadmin","tadmin");
         cmdSrvc.register(plugin,sudoCommand, "tsudo","teamsudo");
 
+    }
+
+    private CommandResult executeBaseHelp(CommandSource src, CommandContext args) {
+
+        Utils.sendPrettyMessage(src,"----EzTeams Help----");
+        Utils.sendPrettyMessage(src,"-Commands-");
+        Utils.sendPrettyMessage(src,"-join : Allows you to join a team.");
+        Utils.sendPrettyMessage(src, "You have perm? "+convertBoolToString(src.hasPermission(Permissions.TEAMS_JOIN)));
+        Utils.sendPrettyMessage(src," ");
+
+        Utils.sendPrettyMessage(src,"-leave : Allows you to leave a team.");
+        Utils.sendPrettyMessage(src, "You have perm? "+convertBoolToString(src.hasPermission(Permissions.TEAMS_LEAVE)));
+        Utils.sendPrettyMessage(src," ");
+
+        Utils.sendPrettyMessage(src,"-list|standings : List all teams and their points");
+        Utils.sendPrettyMessage(src,"You have perm? "+convertBoolToString(src.hasPermission(Permissions.TEAMS_LEAVE)));
+        Utils.sendPrettyMessage(src," ");
+
+        Utils.sendPrettyMessage(src,"-points : List your current points");
+        Utils.sendPrettyMessage(src,"You have perm? "+convertBoolToString(src.hasPermission(Permissions.TEAMS_POINTS_VIEW)));
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-------------------");
+        return CommandResult.success();
+    }
+
+    private CommandResult executeAdminHelp(CommandSource src, CommandContext args){
+        Boolean setTeam = src.hasPermission(Permissions.TEAMS_ADMIN_ADD);
+        Boolean removeTeam = src.hasPermission(Permissions.TEAMS_ADMIN_REMOVE);
+        Boolean points = src.hasPermission(Permissions.TEAMS_ADMIN_MEMBER_POINS);
+        Boolean win = src.hasPermission(Permissions.TEAMS_ADMIN_MEMBER_WIN);
+
+        Utils.sendPrettyMessage(src,"----EzTeams Help----");
+        Utils.sendPrettyMessage(src,"-Commands-");
+        Utils.sendPrettyMessage(src,"-set|add : Allows you to set a members team");
+        Utils.sendPrettyMessage(src,"You have perm? "+convertBoolToString(setTeam));
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-remove : Allows you to remove a player from a team");
+        Utils.sendPrettyMessage(src,"You have perm? "+convertBoolToString(removeTeam));
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-points player add|remove : Allows you to modify a members points");
+        Utils.sendPrettyMessage(src,"You have perm? "+convertBoolToString(points));
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-win position : Adds a preset amount of points to a player");
+        Utils.sendPrettyMessage(src,"You have perm? "+convertBoolToString(win));
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-------------------");
+        return CommandResult.success();
+    }
+
+    private CommandResult executeSudoHelp(CommandSource src, CommandContext args){
+        Utils.sendPrettyMessage(src,"----EzTeams Help----");
+        Utils.sendPrettyMessage(src,"-Commands-");
+        Utils.sendPrettyMessage(src,"-create <name> <prefix> : Allows you to create a new team.");
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-delete <name> : Allows you to delete a team.");
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-reset all|<name> : Allows you to reset a specific team and it's members or resets all points.");
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-prefix|setprefix <name> | Allows you to change a teams prefix.");
+        Utils.sendPrettyMessage(src," ");
+        Utils.sendPrettyMessage(src,"-------------------");
+        return CommandResult.success();
+    }
+
+    private String convertBoolToString(boolean b) {
+        return b ?"Yes":"No";
     }
 
     /**

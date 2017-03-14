@@ -15,6 +15,8 @@ import org.spongepowered.api.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.idrisdev.mc.ezteams.utils.Utils.searchTeamsForName;
+
 /**
  * Created by Idris on 22/01/2017.
  */
@@ -39,7 +41,7 @@ public class AdminSetTeam {
                     String teamname = args.<String>getOne("team").get().toLowerCase();
                     teamname = teamname.toLowerCase();
 
-                    if(!currentTeams.contains(teamname)){
+                    if(!searchTeamsForName(teamname)){
                         Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
                         return CommandResult.empty();
                     } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
@@ -69,7 +71,9 @@ public class AdminSetTeam {
                         Team temp = mem.getTeam();
                         mem.setTeam(team);
                         mem.setMemberPoints(mem.getPoints());
+
                         temp.removeTeamPoints(mem.getPoints());
+                        team.setTeamPoints(mem.getPoints());
                         mem.savePlayer();
 
                         if(!teamname.equals("default")) {

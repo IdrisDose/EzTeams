@@ -1,6 +1,8 @@
 package net.idrisdev.mc.ezteams.commands.teams.sudo;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import net.idrisdev.mc.ezteams.core.data.DAO;
+import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
 import net.idrisdev.mc.ezteams.utils.Utils;
@@ -32,13 +34,16 @@ public class SudoResetTeams {
                     String name = args.<String>getOne("team").get();
                     name = name.toLowerCase();
                     if(name.equalsIgnoreCase("all")){
-                        for (Team t : EzTeams.getTeams()){
-                            setPoints(src,t.getName(),0);
-                        }
+                        //Set all teams and members points to 0
+                        EzTeams.getTeams().stream().filter(t -> setPoints(src, t.getName(), 0)).forEach(t -> Utils.sendSrcErrorMessage(src, "Oops, Something went wrong!"));
+                        plugin.core.getDao().saveAll();
                         Utils.sendPrettyMessage(src,"Successfully reset all team points.");
+
                     } else {
-                        setPoints(src,name,0);
-                        Utils.sendPrettyMessage(src,"Successfully reset team "+name+" points.");
+                        if(!setPoints(src,name,0))
+                            Utils.sendPrettyMessage(src,"Successfully reset team "+name+" points.");
+                        else
+                            Utils.sendSrcErrorMessage(src,"Oops, Something went wrong!");
                     }
 
 
@@ -47,18 +52,47 @@ public class SudoResetTeams {
                 .build();
     }
 
-    private static CommandResult setPoints(CommandSource src, String name, int points){
+    /**
+     * Sets points of a specified team
+     * @param src - CommandSource
+     * @param name - Name of the team
+     * @param points - Points to set team and members to (0)
+     * @return true if error, false if no error occurs.
+     */
+    private static boolean setPoints(CommandSource src, String name, int points){
 
         if(points<0){
             Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");
-            return CommandResult.success();
+            return true;
         }else  if(name.equals("none")){
             Utils.sendSrcErrorMessage(src,"You must specify a target");
-            return CommandResult.success();
+            return true;
         }
 
         Team team = Utils.findTeam(name).get();
         team.setTeamPoints(points);
-        return CommandResult.success();
+            EzTeams.getAllPlayers().stream().filter(m -> m.getTeam().equals(team)).forEach(m -> setPlayerPoints(src,m,points));
+        return false;
+    }
+
+
+    /**
+     * Sets a players point to 0
+     * @param src - CommandSource of the executor
+     * @param m - Member
+     * @param points - Points (0)
+     * @return true if error, false if no error occured.
+     */
+    private static boolean setPlayerPoints(CommandSource src, Member m, int points){
+        if(points<0){
+            Utils.sendSrcErrorMessage(src,"You cannot set negative numbers.");
+            return true;
+        } else if(m==null){
+            Utils.sendSrcErrorMessage(src, "Error occured notify Idris_.");
+            return true;
+        }
+
+        m.setPoints(points);
+        return false;
     }
 }

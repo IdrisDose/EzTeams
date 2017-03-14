@@ -67,6 +67,7 @@ public class DAO {
                 st.execute("CREATE TABLE IF NOT EXISTS "+teamTable+"(ID INT(10), NAME VARCHAR(25), POINTS INT(10), PREFIX VARCHAR(200), PRIMARY KEY(ID));");
                 st.execute("INSERT INTO " + teamTable + "(ID,NAME,POINTS,PREFIX) VALUES(1,'default',0,'&8[&7Default&8]')");
                 st.execute("INSERT INTO " + teamTable + "(ID,NAME,POINTS,PREFIX) VALUES(2,'staff',0,'&4[&cStaff&4]')");
+                st.execute("INSERT INTO " + teamTable + "(ID,NAME,POINTS,PREFIX) VALUES(3,'dev',0,'&8[&6Dev&8]')");
                 Utils.logger.info("Made new TEAMS table");
             } else {
                 Utils.logger.info("Team table initialized.");

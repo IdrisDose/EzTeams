@@ -10,7 +10,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Idris on 22/01/2017.
@@ -95,6 +94,11 @@ public class AdminMemberPoints {
         return CommandResult.success();
     }
     private static CommandResult setPoints(CommandSource src, String name, int points){
+        if(!src.hasPermission(Permissions.TEAMS_SUDO_POINTS_SET)){
+            Utils.sendSrcErrorMessage(src,"No permission");
+            return CommandResult.success();
+        }
+
 
         if(points<0){
             Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");

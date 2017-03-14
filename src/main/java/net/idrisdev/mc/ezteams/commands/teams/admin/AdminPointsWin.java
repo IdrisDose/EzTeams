@@ -10,7 +10,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Idris on 11/03/2017.
@@ -24,7 +23,7 @@ public class AdminPointsWin {
 
     public static CommandSpec buildAdminPointsWin() {
         return CommandSpec.builder()
-                .permission(Permissions.TEAMS_ADMIN)
+                .permission(Permissions.TEAMS_ADMIN_MEMBER_WIN)
                 .description(Utils.getCmdDescription("Used when a player wins a place."))
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.player(Text.of("target"))),

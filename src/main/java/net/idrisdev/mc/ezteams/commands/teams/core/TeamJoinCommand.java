@@ -4,16 +4,12 @@ import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
-import net.idrisdev.mc.ezteams.utils.Utils;
 import net.idrisdev.mc.ezteams.utils.Permissions;
+import net.idrisdev.mc.ezteams.utils.Utils;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static net.idrisdev.mc.ezteams.utils.Utils.searchTeamsForName;
 
@@ -50,6 +46,11 @@ public class TeamJoinCommand {
                     } else if(teamname.equals("default")){
                         Utils.sendSrcErrorMessage(src,"One does not join team default, one must use team leave.");
                         return CommandResult.empty();
+                    } else if(teamname.equals("developer")||teamname.equals("dev")){
+                        if(!((Player) src).getUniqueId().toString().equals("4316aa07-c6a4-4c91-8fc4-9df02465e279")) {
+                            Utils.sendSrcErrorMessage(src, "One does not join team developer, one must be a developer (Idris_ :P).");
+                            return CommandResult.empty();
+                        }
                     }
 
 

@@ -99,6 +99,10 @@ public class AdminTeamPoints {
     }
 
     private static CommandResult setPoints(CommandSource src, String name, int points){
+        if(!src.hasPermission(Permissions.TEAMS_SUDO_POINTS_SET)){
+            Utils.sendSrcErrorMessage(src,"No permission");
+            return CommandResult.success();
+        }
 
         if(points<0){
             Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");

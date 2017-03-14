@@ -28,13 +28,15 @@ public class Permissions {
     public static final String TEAMS_ADMIN_ADD = Utils.PERM_NAME +".admin.add";
     public static final String TEAMS_ADMIN_TEAM_POINS = Utils.PERM_NAME +".admin.team.points";
     public static final String TEAMS_ADMIN_MEMBER_POINS = Utils.PERM_NAME +".admin.member.points";
+    public static final String TEAMS_ADMIN_MEMBER_WIN = Utils.PERM_NAME +".admin.member.win";
     public static final String TEAMS_ADMIN_LIST_TEAMS = Utils.PERM_NAME +".admin.list";
 
     // SUDO
     public static final String TEAMS_SUDO = Utils.PERM_NAME +".sudo.base";
-    public static final String TEAMS_SUDO_REMOVE_TEAM = Utils.PERM_NAME+".sudo.team.remove";
-    public static final String TEAMS_SUDO_ADD_TEAM = Utils.PERM_NAME +".sudo.team.add";
+    public static final String TEAMS_SUDO_REMOVE_TEAM = Utils.PERM_NAME+".sudo.remove";
+    public static final String TEAMS_SUDO_ADD_TEAM = Utils.PERM_NAME +".sudo.create";
     public static final String TEAMS_SUDO_RESET = Utils.PERM_NAME+".sudo.reset";
+    public static final String TEAMS_SUDO_POINTS_SET = Utils.PERM_NAME+"sudo.points.set";
 
     // OTHER
     public static List<String> names = java.util.Arrays.asList("Obeliskthegreat", "Idris_", "Ozzybuns");
