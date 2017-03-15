@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Idris on 23/01/2017.
  */
 public class Core {
-    public static final String VERSION = "1.0";
+    public static final String VERSION = "1.1";
     public static final String NAME = "EzTeams";
     public static final String MODID = "ezteams";
     public static boolean DEBUG;
@@ -153,7 +153,7 @@ public class Core {
                 .permission(Permissions.TEAMS_SUDO)
                 .executor((src, args) -> executeSudoHelp(src,args))
                 .child(teamCreate, "create")
-                .child(teamDelete, "delete")
+                .child(teamDelete, "delete","remove")
                 .child(teamReset, "reset")
                 .child(teamPrefix, "setprefix","prefix")
                 .description(Utils.getCmdDescription("SUDO ONLY - Team Creation and Deletion"))

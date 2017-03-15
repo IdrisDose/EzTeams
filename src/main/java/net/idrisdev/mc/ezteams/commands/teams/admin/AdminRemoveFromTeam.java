@@ -54,7 +54,7 @@ public class AdminRemoveFromTeam {
                         mem.setTeam(team);
                         mem.setPoints(0);
                         mem.savePlayer();
-                        Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
+                        Utils.executeCmdAsConsole("lp user "+target.getName()+" meta unset team");
                         //Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
 
                     }

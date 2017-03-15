@@ -43,7 +43,7 @@ public class TeamJoinCommand {
                     Team defTeam = Utils.findTeam("default").get();
 
                     if(mem == null || team == null){
-                        Utils.sendSrcErrorMessage(src,"An error occured while joining a team. Msg Idris_.");
+                        Utils.sendSrcErrorMessage(src,"An error occurred while joining a team. Msg Idris_.");
                         if(Core.DEBUG) {
                             Utils.sendSrcErrorMessage(src, "mem: " + mem);
                             Utils.sendSrcErrorMessage(src, "team: " + team);
@@ -56,7 +56,6 @@ public class TeamJoinCommand {
                             return CommandResult.success();
                         }
 
-                        Team temp = mem.getTeam();
                         mem.setTeam(team);
                         mem.savePlayer();
 

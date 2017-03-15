@@ -66,8 +66,8 @@ public class AdminSetTeam {
                         mem.savePlayer();
 
                         if(!teamname.equals("default")) {
-                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
-                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta set team "+team.getPrefix());
+                            Utils.executeCmdAsConsole("lp user "+target.getName()+" meta unset team");
+                            Utils.executeCmdAsConsole("lp user "+target.getName()+" meta set team "+team.getPrefix());
                             /*
                             Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
                             Utils.executeCmdAsConsole("puadd " + src.getName() + " " + teamname);

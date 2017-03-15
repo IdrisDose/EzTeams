@@ -33,6 +33,9 @@ public class AdminDeleteTeam {
                     if(team==null){
                         Utils.sendSrcErrorMessage(src,"Team seems to be null.");
                         return CommandResult.success();
+                    } else if(teamName.equals("dev")||teamName.equals("developer")) {
+                        Utils.sendSrcErrorMessage(src, "Sorry, you do not have permission to delete that.");
+                        return CommandResult.success();
                     }
                     plugin.core.getDao().deleteTeam(team);
                     EzTeams.getTeams().remove(team);

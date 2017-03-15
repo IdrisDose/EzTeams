@@ -7,6 +7,10 @@ import net.idrisdev.mc.ezteams.utils.Utils;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Created by Idris on 22/01/2017.
  */
@@ -24,11 +28,13 @@ public class TeamListCommand {
                 .arguments()
                 .executor((src, args) -> {
                     Utils.sendPrettyMessage(src,"----Current Team Standings-----");
+                    List<String> bannedTeams = Arrays.asList("staff","default","dev","developer");
+
                     for(Team team:plugin.getTeams()){
 
                         String name = team.getName();
                         int points = team.getPoints();
-                        if(!name.equals("staff")&&!name.equals("default")&&(!name.equals("dev")||!name.equals("developer"))){
+                        if(!bannedTeams.contains(name)){
                             name=name.substring(0,1).toUpperCase()+name.substring(1);
                             Utils.sendPrettyMessage(src,"Team "+name+" - POINTS: "+points);
                         }

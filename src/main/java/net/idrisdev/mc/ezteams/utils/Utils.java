@@ -169,13 +169,13 @@ public abstract class Utils {
 
     public static boolean teamValidCheck(CommandSource src,String teamname) {
         if(!searchTeamsForName(teamname)){
-            Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
+            Utils.sendSrcErrorMessage(src,teamname+" is not a currently available team.");
             return true;
         } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
             Utils.sendSrcErrorMessage(src,"You are not allowed to join the staff team.");
             return true;
         } if(!(src instanceof Player)){
-            Utils.sendSrcErrorMessage(src,"Only onlineMembers allowed to execute this command!");
+            Utils.sendSrcErrorMessage(src,"Only online members allowed to execute this command!");
             return true;
         } else if(teamname.equals("default")){
             Utils.sendSrcErrorMessage(src,"One does not join team default, one must use team leave.");
