@@ -45,6 +45,7 @@ public class AdminCreateTeam {
                     plugin.core.getDao().saveTeam(newTeam);
 
                     Utils.sendPrettyMessage(src,"Created new team: "+team+".");
+
                     return CommandResult.empty();
                 })
                 .build();

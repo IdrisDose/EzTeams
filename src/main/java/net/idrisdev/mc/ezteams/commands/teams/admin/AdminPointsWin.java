@@ -70,6 +70,7 @@ public class AdminPointsWin {
 
         Member member = Utils.findMember(name);
         member.addMemberPoints(points);
+        Utils.sendPrettyMessage(src,"Successfully added points to user.");
         return CommandResult.success();
     }
 }

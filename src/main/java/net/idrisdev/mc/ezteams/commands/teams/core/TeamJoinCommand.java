@@ -34,29 +34,13 @@ public class TeamJoinCommand {
                     String teamname = args.<String>getOne("team").get();
                     teamname=teamname.toLowerCase();
 
-                    if(!searchTeamsForName(teamname)){
-                        Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
+                    if(Utils.teamValidCheck(src,teamname)){
                         return CommandResult.empty();
-                    } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
-                        Utils.sendSrcErrorMessage(src,"You are not allowed to join the staff team.");
-                        return CommandResult.empty();
-                    } if(!(src instanceof Player)){
-                        Utils.sendSrcErrorMessage(src,"Only onlineMembers allowed to execute this command!");
-                        return CommandResult.empty();
-                    } else if(teamname.equals("default")){
-                        Utils.sendSrcErrorMessage(src,"One does not join team default, one must use team leave.");
-                        return CommandResult.empty();
-                    } else if(teamname.equals("developer")||teamname.equals("dev")){
-                        if(!((Player) src).getUniqueId().toString().equals("4316aa07-c6a4-4c91-8fc4-9df02465e279")) {
-                            Utils.sendSrcErrorMessage(src, "One does not join team developer, one must be a developer (Idris_ :P).");
-                            return CommandResult.empty();
-                        }
                     }
-
-
 
                     Member mem = Utils.findMember(src.getName());
                     Team team = Utils.findTeam(teamname).get();
+                    Team defTeam = Utils.findTeam("default").get();
 
                     if(mem == null || team == null){
                         Utils.sendSrcErrorMessage(src,"An error occured while joining a team. Msg Idris_.");
@@ -66,6 +50,12 @@ public class TeamJoinCommand {
                         }
                         return CommandResult.empty();
                     }else {
+
+                        if(!mem.getTeam().equals(defTeam)){
+                            Utils.sendSrcErrorMessage(src,"You are not in team default, you have to use team leave first!");
+                            return CommandResult.success();
+                        }
+
                         Team temp = mem.getTeam();
                         mem.setTeam(team);
                         mem.savePlayer();
@@ -79,7 +69,7 @@ public class TeamJoinCommand {
                             */
                         }
 
-                        Utils.sendPrettyMessage(src,"Successfully join team "+teamname);
+                        Utils.sendPrettyMessage(src,"Successfully joined team "+teamname);
                     }
                     return CommandResult.success();
                 })

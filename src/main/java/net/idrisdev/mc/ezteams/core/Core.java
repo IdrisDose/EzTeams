@@ -174,6 +174,7 @@ public class Core {
 
         cmdSrvc.register(plugin,adminCommand,"teamadmin","tadmin");
         cmdSrvc.register(plugin,sudoCommand, "tsudo","teamsudo");
+        cmdSrvc.register(plugin,points,"points","mypoints");
 
     }
 

@@ -6,6 +6,7 @@ import net.idrisdev.mc.ezteams.core.entities.Team;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -164,5 +165,27 @@ public abstract class Utils {
                 return t;
         }
         return null;
+    }
+
+    public static boolean teamValidCheck(CommandSource src,String teamname) {
+        if(!searchTeamsForName(teamname)){
+            Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
+            return true;
+        } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
+            Utils.sendSrcErrorMessage(src,"You are not allowed to join the staff team.");
+            return true;
+        } if(!(src instanceof Player)){
+            Utils.sendSrcErrorMessage(src,"Only onlineMembers allowed to execute this command!");
+            return true;
+        } else if(teamname.equals("default")){
+            Utils.sendSrcErrorMessage(src,"One does not join team default, one must use team leave.");
+            return true;
+        }else if(teamname.equals("developer")||teamname.equals("dev")){
+            if(!((Player) src).getUniqueId().toString().equals("4316aa07-c6a4-4c91-8fc4-9df02465e279")) {
+                Utils.sendSrcErrorMessage(src, "One does not join team developer, one must be a developer (Idris_ :P).");
+                return true;
+            }
+        }
+        return false;
     }
 }

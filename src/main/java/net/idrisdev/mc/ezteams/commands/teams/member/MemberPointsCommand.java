@@ -30,8 +30,8 @@ public class MemberPointsCommand {
                     }
                     Member memb = Utils.findMember(src.getName());
                     int points = memb!=null?memb.getPoints():0;
-                    Utils.sendPrettyMessage(src,"Your points are: "+points);
 
+                    Utils.sendPrettyMessage(src,"Your points are: "+points);
                     return CommandResult.success();
                 })
                 .build();

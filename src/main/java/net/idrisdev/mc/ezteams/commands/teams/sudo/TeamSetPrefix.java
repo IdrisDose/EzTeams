@@ -44,7 +44,7 @@ public class TeamSetPrefix {
                     EzTeams.getTeams().add(team);
                     plugin.core.getDao().saveTeam(team);
 
-                    Utils.sendPrettyMessage(src,"Created new team: "+team+".");
+                    Utils.sendPrettyMessage(src,"Changed team "+team.getName()+"'s prefix.");
                     return CommandResult.empty();
                 })
                 .build();

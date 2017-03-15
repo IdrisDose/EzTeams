@@ -77,6 +77,7 @@ public class AdminMemberPoints {
 
         Member member = Utils.findMember(name);
         member.addMemberPoints(points);
+        Utils.sendPrettyMessage(src,"Player "+name+" now has: "+member.getPoints()+" points.");
         return CommandResult.success();
     }
     private static CommandResult removePoints(CommandSource src, String name, int points){
@@ -91,6 +92,7 @@ public class AdminMemberPoints {
 
         Member member = Utils.findMember(name);
         member.removeMemberPoints(points);
+        Utils.sendPrettyMessage(src,"Player "+name+" now has: "+member.getPoints()+" points.");
         return CommandResult.success();
     }
     private static CommandResult setPoints(CommandSource src, String name, int points){
@@ -110,6 +112,7 @@ public class AdminMemberPoints {
 
         Member member = Utils.findMember(name);
         member.setMemberPoints(points);
+        Utils.sendPrettyMessage(src,"Player "+name+" now has: "+member.getPoints()+" points.");
         return CommandResult.success();
     }
 }

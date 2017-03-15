@@ -37,6 +37,8 @@ public class AdminDeleteTeam {
                     plugin.core.getDao().deleteTeam(team);
                     EzTeams.getTeams().remove(team);
                     plugin.core.getDao().saveAll();
+
+                    Utils.sendPrettyMessage(src, "Removed team.");
                     return CommandResult.empty();
                 })
                 .build();

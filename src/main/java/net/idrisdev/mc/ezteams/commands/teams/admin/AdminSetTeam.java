@@ -41,20 +41,9 @@ public class AdminSetTeam {
                     String teamname = args.<String>getOne("team").get().toLowerCase();
                     teamname = teamname.toLowerCase();
 
-                    if(!searchTeamsForName(teamname)){
-                        Utils.sendSrcErrorMessage(src,teamname+" is not a currently avaiable team.");
-                        return CommandResult.empty();
-                    } else if(teamname.equals("staff")&& !src.hasPermission(Permissions.TEAMS_JOIN_STAFF)){
-                        Utils.sendSrcErrorMessage(src,"You are not allowed to join the staff team.");
-                        return CommandResult.empty();
-                    } if(!(src instanceof Player)){
-                        Utils.sendSrcErrorMessage(src,"Only onlineMembers allowed to execute this command!");
-                        return CommandResult.empty();
-                    } else if(teamname.equals("default")){
-                        Utils.sendSrcErrorMessage(src,"One does not join team default, one must use team leave.");
+                    if(Utils.teamValidCheck(src,teamname)){
                         return CommandResult.empty();
                     }
-
 
 
                     Member mem = Utils.findMember(target.getName());
@@ -85,6 +74,8 @@ public class AdminSetTeam {
                             */
                         }
                     }
+                    Utils.sendPrettyMessage(src,"Set user "+mem.getName()+" as team "+team.getName());
+
                     return CommandResult.success();
                 })
                 .build();

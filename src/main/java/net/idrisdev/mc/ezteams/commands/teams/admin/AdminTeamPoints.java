@@ -80,6 +80,7 @@ public class AdminTeamPoints {
 
         Team team = Utils.findTeam(name).get();
         team.addTeamPoints(points);
+        Utils.sendPrettyMessage(src,"Team "+name+" now has: "+team.getPoints()+" points.");
         return CommandResult.success();
     }
 
@@ -95,6 +96,7 @@ public class AdminTeamPoints {
 
         Team team = Utils.findTeam(name).get();
         team.removeTeamPoints(points);
+        Utils.sendPrettyMessage(src,"Team "+name+" now has: "+team.getPoints()+" points.");
         return CommandResult.success();
     }
 
@@ -114,6 +116,7 @@ public class AdminTeamPoints {
 
         Team team = Utils.findTeam(name).get();
         team.setTeamPoints(points);
+        Utils.sendPrettyMessage(src,"Team "+name+" now has: "+team.getPoints()+" points.");
         return CommandResult.success();
     }
 }
