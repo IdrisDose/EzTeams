@@ -1,6 +1,7 @@
 package net.idrisdev.mc.ezteams.commands.teams.admin;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.utils.Permissions;
 import net.idrisdev.mc.ezteams.utils.Utils;
@@ -60,17 +61,22 @@ public class AdminPointsWin {
 
     private static CommandResult addPoints(CommandSource src, String name, int points){
 
-        if(points<0){
-            Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");
+        //Check if name exists or points are negative
+        if(Utils.validatePoints(src,points,name))
             return CommandResult.success();
-        }else  if(name.equals("none")){
-            Utils.sendSrcErrorMessage(src,"You must specify a target");
-            return CommandResult.success();
-        }
 
         Member member = Utils.findMember(name);
+
+
+        //Check if member is blacklisted
+        if(Utils.checkBL(member.getUuid()))
+            return CommandResult.success();
+
         member.addMemberPoints(points);
+
         Utils.sendPrettyMessage(src,"Successfully added points to user.");
+        Core.getTeamsLog().info("Successfully added points to user ("+name+").");
+
         return CommandResult.success();
     }
 }

@@ -11,7 +11,9 @@ import net.idrisdev.mc.ezteams.commands.teams.sudo.SudoResetTeams;
 import net.idrisdev.mc.ezteams.commands.teams.sudo.TeamSetPrefix;
 import net.idrisdev.mc.ezteams.config.ConfigManager;
 import net.idrisdev.mc.ezteams.core.data.DAO;
+import net.idrisdev.mc.ezteams.core.data.Log;
 import net.idrisdev.mc.ezteams.core.entities.Member;
+import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.core.tasks.AutoSaveTask;
 import net.idrisdev.mc.ezteams.core.tasks.JoinEvent;
 import net.idrisdev.mc.ezteams.utils.Permissions;
@@ -28,13 +30,15 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Idris on 23/01/2017.
  */
 public class Core {
-    public static final String VERSION = "1.1";
+    public static final String VERSION = "1.2";
     public static final String NAME = "EzTeams";
     public static final String MODID = "ezteams";
     public static boolean DEBUG;
@@ -45,12 +49,17 @@ public class Core {
     private DAO dao;
 
     private Logger logger = EzTeams.get().getLogger();
+    private static Log fileLog;
 
     private File confFile;
     private ConfigurationLoader<CommentedConfigurationNode> configManager;
 
+    private static List<String> blacklist = Arrays.asList(
+            "f574335b-913c-492f-9470-995285ac5b7a" //GeffxD
+    );
+
     public Core(EzTeams plugin, File confFile, ConfigurationLoader<CommentedConfigurationNode> configManager) {
-        this.plugin = plugin;
+        Core.plugin = plugin;
         this.confFile = confFile;
         this.configManager = configManager;
         configMan = new ConfigManager(configManager,confFile);
@@ -58,6 +67,7 @@ public class Core {
     public void preInitPlugin() {
         logger.info("Starting "+NAME+" v"+VERSION+" reading from Config!");
         configMan.load();
+
         DEBUG = configMan.getConfig().getDebug();
     }
 
@@ -85,16 +95,13 @@ public class Core {
         Utils.fm.init();
 
         registerCommands();
+
+        fileLog = new Log(plugin);
     }
 
     private void registerCommands() {
 
         //Player Team Commands
-        /**
-         * teamJoinCommand - Join a specific team
-         * teamLeavecommand - Leaves a specific team
-         * teamListCommand - Lists the team rankings
-         */
         CommandSpec teamJoinCommand = TeamJoinCommand.buildTeamJoinCommand();
         CommandSpec teamLeaveCommand = TeamLeaveCommand.buildTeamLeaveCommand();
         CommandSpec teamListCommand = TeamListCommand.buildTeamListCommand();
@@ -103,14 +110,6 @@ public class Core {
         CommandSpec bugReport = BugReport.buildbugreport();
 
         //Admin Team Commands
-        /**
-         * memberSetCommand - Add|Set a member to a team
-         * memberRemoveCommand - Remove a member from a team
-         * memberPointsCommand - Set|Add|Remove points from a Member
-         * teamPointsCommand - Set|Add|Remove points from a Team
-         * memberCountCommand - Count how many members a team has -UNUSED-
-         * teamAdminListCommand - List ALL of the teams including default and staff.
-        */
         CommandSpec memberSetCommand = AdminSetTeam.buildMemberSetTeam();
         CommandSpec memberRemoveCommand = AdminRemoveFromTeam.buildMemberRemoveTeam();
         CommandSpec memberPointsCommand = AdminMemberPoints.buildAdminMemberPoints();
@@ -120,10 +119,6 @@ public class Core {
         CommandSpec memberWinPoints = AdminPointsWin.buildAdminPointsWin();
 
         //Sudo Commands
-        /**
-         * teamCreate - Create a team with prefix
-         * teamDelete - Remove a Team
-         */
         CommandSpec teamCreate = AdminCreateTeam.buildAdminCreateTeam();
         CommandSpec teamDelete = AdminDeleteTeam.buildAdminDeleteTeam();
         CommandSpec teamReset = SudoResetTeams.buildSudoResetTeams();
@@ -140,18 +135,19 @@ public class Core {
 
         CommandSpec adminCommand = CommandSpec.builder()
                 .permission(Permissions.TEAMS_ADMIN)
-                .executor((src, args) -> executeAdminHelp(src,args))
+                .executor(this::executeAdminHelp)
                 .child(memberSetCommand, "add","set")
                 .child(memberRemoveCommand,"remove")
                 .child(teamAdminListCommand,"list")
                 .child(points,"points")
                 .child(memberWinPoints,"win")
+                .child(memberCountCommand,"count")
                 .description(Utils.getCmdDescription("ADMIN ONLY - team member management"))
                 .build();
 
         CommandSpec sudoCommand = CommandSpec.builder()
                 .permission(Permissions.TEAMS_SUDO)
-                .executor((src, args) -> executeSudoHelp(src,args))
+                .executor(this::executeSudoHelp)
                 .child(teamCreate, "create")
                 .child(teamDelete, "delete","remove")
                 .child(teamReset, "reset")
@@ -164,7 +160,7 @@ public class Core {
         cmdSrvc.register(plugin, CommandSpec.builder()
                 .description(Utils.getCmdDescription("The core team management command."))
                 .permission(Permissions.TEAMS_BASE)
-                .executor((src, args) -> executeBaseHelp(src,args))
+                .executor(this::executeBaseHelp)
                 .child(teamJoinCommand,"join")
                 .child(teamLeaveCommand, "leave")
                 .child(teamListCommand, "list", "standings")
@@ -174,7 +170,7 @@ public class Core {
 
         cmdSrvc.register(plugin,adminCommand,"teamadmin","tadmin");
         cmdSrvc.register(plugin,sudoCommand, "tsudo","teamsudo");
-        cmdSrvc.register(plugin,points,"points","mypoints");
+        cmdSrvc.register(plugin,memberMyPoints,"points","mypoints");
 
     }
 
@@ -261,19 +257,26 @@ public class Core {
     /**
      * Operates the ClientJoinEvent
      *
-     * @param event
+     * @param event - Event that's fired
      */
     public void ClientJoin(ClientConnectionEvent.Join event){
         Player player = event.getTargetEntity();
+
+        if(blacklist.contains(player.getUniqueId().toString()))
+            Utils.sendSrcErrorMessage(player.getCommandSource().get(),"You have been blacklisted.");
+
+
         JoinEvent.runJoinEvent(player,plugin,DEBUG);
     }
     public void ClientLeave(ClientConnectionEvent.Disconnect event){
         Player target = event.getTargetEntity();
         Member member = Utils.findMember(target.getName());
 
-        plugin.getOnlineMembers().remove(member);
+        EzTeams.getOnlineMembers().remove(member);
     }
     public void onServerStart() {
+        for (Team t : EzTeams.getTeams()) fileLog.info(t.toString());
+
         logger.info("Starting AutoSave task");
         EzTeams.getGame().getScheduler().createTaskBuilder()
                 .execute(new AutoSaveTask(configMan.getConfig(),plugin))
@@ -292,4 +295,8 @@ public class Core {
         }
 
     }
+
+    public static List<String> getBlackList(){return blacklist;}
+
+    public static Log getTeamsLog(){ return fileLog;}
 }

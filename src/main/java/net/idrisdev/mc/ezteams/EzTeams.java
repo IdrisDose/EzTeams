@@ -4,15 +4,12 @@ import com.google.inject.Inject;
 import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
-import net.idrisdev.mc.ezteams.utils.Permissions;
-import net.idrisdev.mc.ezteams.utils.Utils;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.GameReloadEvent;
@@ -37,7 +34,7 @@ import java.util.List;
         dependencies = @Dependency(id = "pixelmon"))
 
 public class EzTeams {
-    public static final String MODID = Core.MODID;
+    static final String MODID = Core.MODID;
     public static final String NAME = Core.NAME;
     public static final String VERSION = Core.VERSION;
     private static List<Team> teams = new ArrayList<>();
@@ -46,7 +43,7 @@ public class EzTeams {
 
     //shit for plugins
     private static EzTeams plugin;
-    static void set(EzTeams value) {
+    private static void set(EzTeams value) {
         plugin = value;
     }
     public Core core;
@@ -135,4 +132,5 @@ public class EzTeams {
     public static void setAllPlayers(List<Member> allPlayers) {
         EzTeams.allPlayers = allPlayers;
     }
+
 }

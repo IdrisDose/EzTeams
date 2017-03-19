@@ -26,7 +26,6 @@ public class TeamLeaveCommand {
                 .description(Utils.getCmdDescription("For those who wish to abandon the greate cause."))
                 .arguments()
                 .executor((src, args) -> {
-                    String teamname = "default";
 
                     if(!(src instanceof Player)){
                         Utils.sendSrcErrorMessage(src,"Only onlineMembers allowed to execute this command!");
@@ -36,25 +35,18 @@ public class TeamLeaveCommand {
 
 
                     Member mem = Utils.findMember(src.getName());
-                    Team team = Utils.findTeam(teamname).get();
+                    Team team = Utils.findTeam("default").get();
 
-                    if(mem == null || team == null){
-                        Utils.sendSrcErrorMessage(src,"An error occured while joining a team. Msg Idris_.");
-                        if(Core.DEBUG) {
-                            Utils.sendSrcErrorMessage(src, "mem: " + mem);
-                            Utils.sendSrcErrorMessage(src, "team: " + team);
-                        }
-                        return CommandResult.empty();
-                    }else {
-                        Team temp = mem.getTeam();
-                        mem.setTeam(team);
-                        mem.setMemberPoints(0);
-                        mem.savePlayer();
-                        //Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
-                        Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
-                    }
+                    if(Utils.leaveValidate(src,mem,team))
+                        return CommandResult.success();
 
+
+                    Team temp = mem.getTeam();
+                    mem.leaveTeam(team,temp);
+
+                    Core.getTeamsLog().info(mem.getName()+" left their team. Old TEAM Points: "+temp.getPoints());
                     Utils.executeCmdAsConsole("plainbroadcast &4[&9"+Utils.NAME+"&4] &c"+mem.getName()+" has abandoned their team, they now have 0 points.");
+
                     return CommandResult.success();
                 })
                 .build();

@@ -1,8 +1,10 @@
 package net.idrisdev.mc.ezteams.core.entities;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.utils.Utils;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.command.CommandSource;
 
 /**
  * Created by Idris on 5/01/2017.
@@ -42,7 +44,7 @@ public class Member {
             plugin.core.getDao().insertPlayer(this);
     }
 
-    public void getPlayerData(String id){
+    private void getPlayerData(String id){
         Member container = plugin.core.getDao().getMemberData(id);
         this.team = container.getTeam();
         this.points = container.getPoints();
@@ -68,9 +70,9 @@ public class Member {
     public Team getTeam() {
         return (this.team);
     }
+
     public void setTeam(Team team) {
         this.team = team;
-
     }
 
     public void addMemberPoints(int points){
@@ -83,19 +85,58 @@ public class Member {
         this.getTeam().removeTeamPoints(points);
         savePlayer();
     }
-    public void setMemberPoints(int points){
+    public void setMemberPoints(int newPoints){
         int oldPoints = this.getPoints();
         Team team = this.getTeam();
-        this.setPoints(points);
-        if(points<oldPoints){
-            int temp = oldPoints-points;
-            team.removeTeamPoints(temp);
-        } else if(points>oldPoints){
-            int temp = points-oldPoints;
-            team.addTeamPoints(temp);
+        this.setPoints(newPoints);
+        //If oldPoints less than new points
+        if(oldPoints < newPoints){
+            //rPoints = newPoints minus oldPoints - get remainder
+            int rPoints = newPoints-oldPoints;
+            team.addTeamPoints(rPoints);
+        //If they had more points before, remove those remaining points from team.
+        }else if(oldPoints > newPoints){
+            int rPoints = oldPoints-newPoints;
+            team.removeTeamPoints(rPoints);
         }
 
         savePlayer();
+    }
+
+    public void leaveTeam(Team team, Team temp){
+        this.setPoints(0);
+        this.setTeam(team);
+
+        Utils.executeCmdAsConsole("lp user "+this.getName()+" meta unset team");
+        //Logging to file that user left their team.
+        this.savePlayer();
+    }
+
+    public void joinTeam(Team team){
+        this.setTeam(team);
+
+        Utils.executeCmdAsConsole("lp user "+this.getName()+" meta unset team");
+        Utils.executeCmdAsConsole("lp user "+this.getName()+" meta set team "+team.getPrefix());
+
+        Core.getTeamsLog().info("User "+this.getName()+" joined team "+team.getName());
+
+        this.savePlayer();
+    }
+
+    public void changeTeam(CommandSource src, Team team, Team oldTeam) {
+        int points = this.getPoints();
+        this.setTeam(team);
+
+        oldTeam.memberChange(this);
+        team.addTeamPoints(points);
+
+        Utils.executeCmdAsConsole("lp user "+this.getName()+" meta unset team");
+        Utils.executeCmdAsConsole("lp user "+this.getName()+" meta set team "+team.getPrefix());
+
+        Utils.sendPrettyMessage(src,"Set user "+this.getName()+" as team "+team.getName());
+        Core.getTeamsLog().info(src.getName() +" set "+this.getName()+" team as: "+team.getName());
+
+        this.savePlayer();
     }
 
     public int getPoints() {
@@ -104,7 +145,6 @@ public class Member {
     public void setPoints(int points) {
         this.points = points;
     }
-
     @Override
     public String toString() {
         return "Member{" +
@@ -113,4 +153,6 @@ public class Member {
                 ", points=" + points +
                 '}';
     }
+
+
 }

@@ -4,9 +4,6 @@ import net.idrisdev.mc.ezteams.EzTeams;
 import net.idrisdev.mc.ezteams.config.Config;
 import net.idrisdev.mc.ezteams.utils.Utils;
 
-import java.util.List;
-import java.util.Random;
-
 /**
  * Created by Idris on 23/01/2017.
  */

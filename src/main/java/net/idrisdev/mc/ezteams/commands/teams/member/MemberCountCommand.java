@@ -1,6 +1,7 @@
 package net.idrisdev.mc.ezteams.commands.teams.member;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
 import net.idrisdev.mc.ezteams.utils.Utils;
 import org.spongepowered.api.command.CommandResult;
@@ -27,22 +28,23 @@ public class MemberCountCommand {
                 )
                 .executor((src, args) -> {
                     String team = args.<String>getOne("team").isPresent()?args.<String>getOne("team").get():"all";
-
                     team=team.toLowerCase();
 
-                    int aquacount = Utils.findTeamCount("aqua");
-                    int galacticcount = Utils.findTeamCount("galactic");
-                    int magmacount = Utils.findTeamCount("magma");
-                    int plasmacount = Utils.findTeamCount("plasma");
-                    int rocketcount = Utils.findTeamCount("rocket");
-
+                    if(!team.equals("all")){
+                        int count = Utils.findTeamCount(team);
+                        Utils.sendPrettyMessage(src,"Team "+team+" member count: "+count);
+                        return CommandResult.success();
+                    }
 
                     Utils.sendPrettyMessage(src,"---Team Member Count---");
-                    Utils.sendPrettyMessage(src,"- Team: Aqua - Member Count: "+aquacount);
-                    Utils.sendPrettyMessage(src,"- Team: Galactic - Member Count: "+galacticcount);
-                    Utils.sendPrettyMessage(src,"- Team: Magma - Member Count: "+magmacount);
-                    Utils.sendPrettyMessage(src,"- Team: Plasma - Member Count: "+plasmacount);
-                    Utils.sendPrettyMessage(src,"- Team: Rocket - Member Count: "+rocketcount);
+
+                    for(Team t: EzTeams.getTeams()){
+                        String name = t.getName();
+                        int count = Utils.findTeamCount(name);
+                        name=name.substring(0,1).toUpperCase()+name.substring(1);
+                        Utils.sendPrettyMessage(src,"Team "+name+" - COUNT: "+count);
+                    }
+
                     Utils.sendPrettyMessage(src,"----------------------");
 
                     return CommandResult.success();

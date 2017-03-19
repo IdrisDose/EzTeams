@@ -1,7 +1,6 @@
 package net.idrisdev.mc.ezteams.commands.teams.core;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
@@ -9,9 +8,7 @@ import net.idrisdev.mc.ezteams.utils.Utils;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.living.player.Player;
-
-import static net.idrisdev.mc.ezteams.utils.Utils.searchTeamsForName;
+import org.spongepowered.api.text.Text;
 
 /**
  * Created by Idris on 22/01/2017.
@@ -28,48 +25,26 @@ public class TeamJoinCommand {
                 .permission(Permissions.TEAMS_JOIN)
                 .description(Utils.getCmdDescription("Join a team using this command!"))
                 .arguments(
-                        GenericArguments.onlyOne(Utils.stringarg("team"))
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("team")))
                 )
                 .executor((src, args) -> {
-                    String teamname = args.<String>getOne("team").get();
-                    teamname=teamname.toLowerCase();
+                    String teamName = args.<String>getOne("team").get();
+                    teamName=teamName.toLowerCase();
 
-                    if(Utils.teamValidCheck(src,teamname)){
+                    if(Utils.teamValidCheck(src,teamName)){
                         return CommandResult.empty();
                     }
 
                     Member mem = Utils.findMember(src.getName());
-                    Team team = Utils.findTeam(teamname).get();
-                    Team defTeam = Utils.findTeam("default").get();
+                    Team team = Utils.findTeam(teamName).get();
 
-                    if(mem == null || team == null){
-                        Utils.sendSrcErrorMessage(src,"An error occurred while joining a team. Msg Idris_.");
-                        if(Core.DEBUG) {
-                            Utils.sendSrcErrorMessage(src, "mem: " + mem);
-                            Utils.sendSrcErrorMessage(src, "team: " + team);
-                        }
-                        return CommandResult.empty();
-                    }else {
+                    // if this returns true, exit command
+                    if(Utils.joinValidate(src, mem,team))
+                        return CommandResult.success();
 
-                        if(!mem.getTeam().equals(defTeam)){
-                            Utils.sendSrcErrorMessage(src,"You are not in team default, you have to use team leave first!");
-                            return CommandResult.success();
-                        }
+                    mem.joinTeam(team);
+                    Utils.sendPrettyMessage(src,"Successfully joined team "+teamName);
 
-                        mem.setTeam(team);
-                        mem.savePlayer();
-
-                        if(!teamname.equals("default")) {
-                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta unset team");
-                            Utils.executeCmdAsConsole("lp user "+src.getName()+" meta set team "+team.getPrefix());
-                            /*
-                            Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
-                            Utils.executeCmdAsConsole("puadd " + src.getName() + " " + teamname);
-                            */
-                        }
-
-                        Utils.sendPrettyMessage(src,"Successfully joined team "+teamname);
-                    }
                     return CommandResult.success();
                 })
                 .build();

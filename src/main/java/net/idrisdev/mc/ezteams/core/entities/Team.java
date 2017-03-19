@@ -1,8 +1,7 @@
 package net.idrisdev.mc.ezteams.core.entities;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import net.idrisdev.mc.ezteams.core.Core;
 
 /**
  * Created by Idris on 5/01/2017.
@@ -52,16 +51,20 @@ public class Team {
 
     public void addTeamPoints(int points){
         this.setPoints(this.getPoints()+points);
+
+        Core.getTeamsLog().info("Points added ("+points+") TOTAL: "+this.getPoints());
         this.save();
     }
 
     public void removeTeamPoints(int points){
         this.setPoints(this.getPoints()-points);
+        Core.getTeamsLog().info("Points removed: "+points+"; Cur Points: "+this.getPoints());
         this.save();
     }
 
-    public void setTeamPoints(int points){
-        this.setPoints(points);
+    public void setTeamPoints(int newPoints){
+        this.setPoints(newPoints);
+        Core.getTeamsLog().info("Team("+this.name+") points Changed: "+this.getPoints());
         this.save();
     }
 
@@ -82,8 +85,19 @@ public class Team {
         return name+"{" +
                 "id=" + id +
                 ", name=" + name +
+                ", points="+ points +
                 '}';
     }
 
 
+    void memberChange(Member member) {
+        int memberPoints = member.getPoints();
+
+        if(this.points<memberPoints){
+            this.setPoints(0);
+        } else{
+            this.setPoints(this.getPoints()-memberPoints);
+        }
+
+    }
 }

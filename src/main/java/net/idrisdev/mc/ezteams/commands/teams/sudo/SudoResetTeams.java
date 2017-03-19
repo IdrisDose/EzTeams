@@ -1,7 +1,6 @@
 package net.idrisdev.mc.ezteams.commands.teams.sudo;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.core.data.DAO;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
@@ -11,7 +10,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 /**
  * Created by Idris on 11/03/2017.
@@ -60,14 +58,8 @@ public class SudoResetTeams {
      * @return true if error, false if no error occurs.
      */
     private static boolean setPoints(CommandSource src, String name, int points){
-
-        if(points<0){
-            Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");
+        if(Utils.validatePoints(src,points,name))
             return true;
-        }else  if(name.equals("none")){
-            Utils.sendSrcErrorMessage(src,"You must specify a target");
-            return true;
-        }
 
         Team team = Utils.findTeam(name).get();
         team.setTeamPoints(points);

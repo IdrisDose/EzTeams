@@ -1,7 +1,5 @@
 package net.idrisdev.mc.ezteams.config.category;
 
-import net.idrisdev.mc.ezteams.core.entities.Team;
-import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.Arrays;

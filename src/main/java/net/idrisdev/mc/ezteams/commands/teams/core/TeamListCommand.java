@@ -1,13 +1,13 @@
 package net.idrisdev.mc.ezteams.commands.teams.core;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
 import net.idrisdev.mc.ezteams.utils.Utils;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,7 +30,9 @@ public class TeamListCommand {
                     Utils.sendPrettyMessage(src,"----Current Team Standings-----");
                     List<String> bannedTeams = Arrays.asList("staff","default","dev","developer");
 
-                    for(Team team:plugin.getTeams()){
+                    Member mem = Utils.findMember(src.getName());
+
+                    for(Team team: EzTeams.getTeams()){
 
                         String name = team.getName();
                         int points = team.getPoints();

@@ -42,23 +42,13 @@ public class AdminRemoveFromTeam {
                     Member mem = Utils.findMember(target.getName());
                     Team team = Utils.findTeam(teamname).get();
 
-                    if(mem == null || team == null){
-                        Utils.sendSrcErrorMessage(src,"An error occured while joining a team. Msg Idris_.");
-                        if(Core.DEBUG) {
-                            Utils.sendSrcErrorMessage(src, "mem: " + mem);
-                            Utils.sendSrcErrorMessage(src, "team: " + team);
-                        }
-                        return CommandResult.empty();
-                    }else {
-                        Team temp = mem.getTeam();
-                        mem.setTeam(team);
-                        mem.setPoints(0);
-                        mem.savePlayer();
-                        Utils.executeCmdAsConsole("lp user "+target.getName()+" meta unset team");
-                        //Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
+                    if(Utils.validateRemoveOther(src,mem,team))
+                        return CommandResult.success();
 
-                    }
+                    Team temp = mem.getTeam();
+                    mem.leaveTeam(team,temp);
 
+                    Core.getTeamsLog().info(src.getName()+" removed "+target.getName()+" from their team!");
                     Utils.executeCmdAsConsole("plainbroadcast &4[&9"+Utils.NAME+"&4] &c"+mem.getName()+" has been removed from their team, they now have 0 points.");
                     return CommandResult.success();
                 })

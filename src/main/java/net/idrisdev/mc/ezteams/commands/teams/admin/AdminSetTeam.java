@@ -1,7 +1,6 @@
 package net.idrisdev.mc.ezteams.commands.teams.admin;
 
 import net.idrisdev.mc.ezteams.EzTeams;
-import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.core.entities.Team;
 import net.idrisdev.mc.ezteams.utils.Permissions;
@@ -14,8 +13,6 @@ import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static net.idrisdev.mc.ezteams.utils.Utils.searchTeamsForName;
 
 /**
  * Created by Idris on 22/01/2017.
@@ -49,32 +46,12 @@ public class AdminSetTeam {
                     Member mem = Utils.findMember(target.getName());
                     Team team = Utils.findTeam(teamname).get();
 
-                    if(mem == null || team == null){
-                        Utils.sendSrcErrorMessage(src,"An error occured while joining a team. Msg Idris_.");
-                        if(Core.DEBUG) {
-                            Utils.sendSrcErrorMessage(src, "mem: " + mem);
-                            Utils.sendSrcErrorMessage(src, "team: " + team);
-                        }
-                        return CommandResult.empty();
-                    }else {
-                        Team temp = mem.getTeam();
-                        mem.setTeam(team);
-                        mem.setMemberPoints(mem.getPoints());
+                    if(Utils.validateOther(src,mem,team))
+                        return CommandResult.success();
 
-                        temp.removeTeamPoints(mem.getPoints());
-                        team.setTeamPoints(mem.getPoints());
-                        mem.savePlayer();
 
-                        if(!teamname.equals("default")) {
-                            Utils.executeCmdAsConsole("lp user "+target.getName()+" meta unset team");
-                            Utils.executeCmdAsConsole("lp user "+target.getName()+" meta set team "+team.getPrefix());
-                            /*
-                            Utils.executeCmdAsConsole("pudel " + src.getName() + " " + temp.getName());
-                            Utils.executeCmdAsConsole("puadd " + src.getName() + " " + teamname);
-                            */
-                        }
-                    }
-                    Utils.sendPrettyMessage(src,"Set user "+mem.getName()+" as team "+team.getName());
+                    Team temp = mem.getTeam();
+                    mem.changeTeam(src,team,temp);
 
                     return CommandResult.success();
                 })

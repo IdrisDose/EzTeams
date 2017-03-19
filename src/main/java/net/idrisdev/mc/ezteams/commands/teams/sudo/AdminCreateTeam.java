@@ -31,8 +31,13 @@ public class AdminCreateTeam {
                     String team = args.<String>getOne("team").get().toLowerCase();
                     String prefix = args.<String>getOne("prefix").get();
 
+
                     if(Utils.searchTeamsForName(team)){
                         Utils.sendSrcErrorMessage(src, "Team already exists, please remove first.");
+                        return CommandResult.empty();
+                    }
+                    if(Utils.getBlacklist().contains(team)){
+                        Utils.sendSrcErrorMessage(src,"This team name has been blacklisted.");
                         return CommandResult.empty();
                     }
 

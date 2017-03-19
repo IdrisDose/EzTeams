@@ -1,6 +1,7 @@
 package net.idrisdev.mc.ezteams.commands.teams.admin;
 
 import net.idrisdev.mc.ezteams.EzTeams;
+import net.idrisdev.mc.ezteams.core.Core;
 import net.idrisdev.mc.ezteams.core.entities.Member;
 import net.idrisdev.mc.ezteams.utils.Permissions;
 import net.idrisdev.mc.ezteams.utils.Utils;
@@ -67,32 +68,32 @@ public class AdminMemberPoints {
 
     private static CommandResult addPoints(CommandSource src, String name, int points){
 
-        if(points<0){
-            Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");
+        if(Utils.validatePoints(src,points,name))
             return CommandResult.success();
-        }else  if(name.equals("none")){
-            Utils.sendSrcErrorMessage(src,"You must specify a target");
-            return CommandResult.success();
-        }
 
         Member member = Utils.findMember(name);
+
+        if(Utils.checkBL(member.getUuid()))
+            return CommandResult.success();
+
         member.addMemberPoints(points);
         Utils.sendPrettyMessage(src,"Player "+name+" now has: "+member.getPoints()+" points.");
+        Core.getTeamsLog().info("Player "+name+" now has: "+member.getPoints()+" points.");
         return CommandResult.success();
     }
     private static CommandResult removePoints(CommandSource src, String name, int points){
 
-        if(points<0){
-            Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");
+        if(Utils.validatePoints(src,points,name))
             return CommandResult.success();
-        }else  if(name.equals("none")){
-            Utils.sendSrcErrorMessage(src,"You must specify a target");
-            return CommandResult.success();
-        }
 
         Member member = Utils.findMember(name);
+
+        if(Utils.checkBL(member.getUuid()))
+            return CommandResult.success();
+
         member.removeMemberPoints(points);
         Utils.sendPrettyMessage(src,"Player "+name+" now has: "+member.getPoints()+" points.");
+        Core.getTeamsLog().info("Player "+name+" now has: "+member.getPoints()+" points.");
         return CommandResult.success();
     }
     private static CommandResult setPoints(CommandSource src, String name, int points){
@@ -102,17 +103,17 @@ public class AdminMemberPoints {
         }
 
 
-        if(points<0){
-            Utils.sendSrcErrorMessage(src,"You cannot use negative numbers.");
+        if(Utils.validatePoints(src,points,name))
             return CommandResult.success();
-        }else  if(name.equals("none")){
-            Utils.sendSrcErrorMessage(src,"You must specify a target");
-            return CommandResult.success();
-        }
 
         Member member = Utils.findMember(name);
+
+        if(Utils.checkBL(member.getUuid()))
+            return CommandResult.success();
+
         member.setMemberPoints(points);
         Utils.sendPrettyMessage(src,"Player "+name+" now has: "+member.getPoints()+" points.");
+        Core.getTeamsLog().info("Player "+name+" now has: "+member.getPoints()+" points.");
         return CommandResult.success();
     }
 }

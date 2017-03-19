@@ -1,8 +1,6 @@
 package net.idrisdev.mc.ezteams.config;
 
-import net.idrisdev.mc.ezteams.config.category.DatabaseCategory;
 import net.idrisdev.mc.ezteams.config.category.PointsCategory;
-import net.idrisdev.mc.ezteams.config.category.TeamsCategory;
 import ninja.leaping.configurate.objectmapping.Setting;
 
 /**
