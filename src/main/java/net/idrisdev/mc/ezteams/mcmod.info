@@ -1,7 +1,7 @@
 [{
     "modid": "ezteams",
     "name": "EzTeams - Light-Weight Teams",
-    "version": "1.0",
+    "version": "1.2",
     "description": "This plugin is designed for PixelMC to server functionality to teams.",
     "authorList": [
        "Idris_"
