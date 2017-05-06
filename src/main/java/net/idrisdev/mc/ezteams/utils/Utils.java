@@ -57,7 +57,7 @@ public abstract class Utils {
     }
 
     public static void plainbroadcastAsConsole(String msg){
-        executeCmdAsConsole("plainbroadcast &4[&9"+NAME+"&4] &c"+msg);
+        executeCmdAsConsole("plainbroadcast &4[&9"+NAME+"&4] &f"+msg);
     }
 
     public static Member findMember(String name) {

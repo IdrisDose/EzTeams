@@ -20,9 +20,9 @@ public class AutoSaveTask implements Runnable{
     public void run() {
         try {
             plugin.getLogger().info("Saving Team Data");
-            Utils.plainbroadcastAsConsole("Now saving teams data, may lag.");
+            Utils.plainbroadcastAsConsole("&7&oNow saving teams data, may lag.");
             plugin.core.getDao().saveAll();
-            Utils.plainbroadcastAsConsole("Successfully saved teams data!");
+            Utils.plainbroadcastAsConsole("&7&oSuccessfully saved teams data!");
         } catch ( Exception e ){
             plugin.getLogger().error("ERROR RUNNING AUTOSAVE TASK!!!!");
             e.printStackTrace();

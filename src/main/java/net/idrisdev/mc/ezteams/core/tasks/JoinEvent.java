@@ -25,6 +25,7 @@ public class JoinEvent {
                 temp = new Member(uuid, name);
                 plugin.getAllPlayers().add(temp);
 
+
                 plugin.getLogger().info("Player added to all member list.");
             }
 

